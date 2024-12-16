@@ -3,6 +3,7 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import { CssBaseline, ThemeProvider, Box } from "@mui/material";
 import theme from "./theme";
 import Header from "@/components/Header";
+import { AuthProvider } from "@/contexts/AuthProvider";
 
 export const metadata = {
   title: "Expertly",
@@ -20,11 +21,13 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AppRouterCacheProvider>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <Header />
-            {children}
-          </ThemeProvider>
+          <AuthProvider>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              <Header />
+              {children}
+            </ThemeProvider>
+          </AuthProvider>
         </AppRouterCacheProvider>
       </body>
     </html>
