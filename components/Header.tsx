@@ -110,6 +110,14 @@ const Header: React.FC = () => {
           >
             <Button
               variant="outlined"
+              onClick={() => router.push("/auth/signin")}
+              startIcon={<AccountCircle />}
+              sx={{ height: "40px" }}
+            >
+              Signin
+            </Button>
+            <Button
+              variant="outlined"
               onClick={() => router.push("/application")}
               startIcon={<Whatshot />}
               sx={{ height: "40px" }}

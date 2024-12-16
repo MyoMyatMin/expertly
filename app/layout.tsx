@@ -8,8 +8,6 @@ import { AuthProvider } from "@/contexts/AuthProvider";
 export const metadata = {
   title: "Expertly",
   description: "This is a knowledge sharing platform shared by experts.",
-
-  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({
