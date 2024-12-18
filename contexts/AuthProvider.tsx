@@ -1,6 +1,7 @@
 "use client";
 import { createContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { refreshToken } from "@/helper/apihelper"; // Import the helper function
 
 interface User {
   ID: string;
@@ -35,10 +36,59 @@ const AuthContext = createContext<{
 });
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  // const [user, setUser] = useState(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  const fetchUser = async () => {
+    const response = await fetch("http://localhost:8000/auth/me", {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (response.ok) {
+      const userData = await response.json();
+      setUser(userData.user);
+    } else if (response.status === 401) {
+      const errorData = await response.json();
+      console.log(errorData.error);
+      if (errorData.error === "token is expired") {
+        console.log("Token is expired, attempting to refresh...");
+        await handleRefreshAndCheckUser();
+      } else {
+        setUser(null);
+        console.log("User session invalid. Redirecting to sign-in.");
+        router.push("/auth/signin");
+      }
+    } else {
+      setUser(null);
+      console.log("User session invalid. Redirecting to sign-in.");
+      router.push("/auth/signin");
+    }
+  };
+
+  const handleRefreshAndCheckUser = async () => {
+    try {
+      await refreshToken();
+      await fetchUser();
+    } catch (err) {
+      console.error("Error refreshing token:", err);
+      setUser(null);
+      router.push("/auth/signin");
+    }
+  };
+
+  const checkUser = async () => {
+    setLoading(true);
+    try {
+      await fetchUser();
+    } catch (err) {
+      console.error("Error fetching user:", err);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const dummyUsers = [
@@ -47,7 +97,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         Name: "MMM",
         Email: "mmm@gmail.com",
         Role: {
-          String: "user", //'user', 'contributor', 'moderator', 'superadmin'
+          String: "moderator", //'user', 'contributor', 'moderator', 'superadmin'
           Valid: true,
         },
         SuspendedUntil: {
@@ -56,31 +106,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         },
       },
     ];
-    const checkUser = async () => {
-      setLoading(true);
-      try {
-        // const response = await fetch("http://localhost:8000/auth/me", {
-        //   method: "GET",
-        //   credentials: "include",
-        // });
-
-        // if (response.ok) {
-        //   const userData = await response.json();
-        //   setUser(userData);
-        // } else {
-        //   setUser(null);
-        // }
-        const authenticatedUser = dummyUsers[0]; // null if u want to see sigin
-        setUser(authenticatedUser);
-      } catch (err) {
-        console.error("Error fetching user:", err);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkUser();
+    // checkUser();
+    const authenticatedUser = dummyUsers[0]; // null if u want to see sigin
+    setUser(authenticatedUser);
   }, []);
 
   const signin = async (email: string, password: string) => {
@@ -96,7 +124,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       if (response.ok) {
         const userData = await response.json();
-        setUser(userData);
+        setUser(userData.user);
         router.push("/profile");
       } else {
         console.error("Login failed.");
@@ -131,13 +159,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const logout = async () => {
     try {
-      const response = await fetch("/api/auth/logout", {
+      const response = await fetch("http://localhost:8000/logout", {
         method: "POST",
       });
 
       if (response.ok) {
         setUser(null);
-        router.push("/login");
+        router.push("/auth/signin");
       } else {
         console.error("Logout failed.");
       }
@@ -148,13 +176,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const value = { user, signin, signup, logout, loading };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {/* {!loading && children} */}
-      {/* Uncomment this line to prevent rendering children until user is loaded */}
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export default AuthContext;
