@@ -1,7 +1,27 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { Box, TextField, Button, Chip, Paper, Typography } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Chip,
+  Paper,
+  Typography,
+  IconButton,
+} from "@mui/material";
+import { CldUploadWidget } from "next-cloudinary";
+import DeleteIcon from "@mui/icons-material/Delete";
+
+interface CloudinaryUploadResult {
+  event: string;
+  info: {
+    secure_url: string;
+    public_id: string;
+    asset_id: string;
+    url: string;
+  };
+}
 
 interface BlogEditorProps {
   title: string;
@@ -11,7 +31,13 @@ interface BlogEditorProps {
   selectedTags: string[];
   setSelectedTags: (selectedTags: string[]) => void;
   tags: { id: string; name: string }[];
-  onSave: () => void;
+  onSave: (data: {
+    title: string;
+    content: string;
+    tags: string[];
+    images: string[];
+  }) => void;
+  onImageUpload: (urls: string[]) => void;
 }
 
 function BlogEditor({
@@ -23,13 +49,64 @@ function BlogEditor({
   setSelectedTags,
   tags = [],
   onSave = () => {},
+  onImageUpload = () => {},
 }: BlogEditorProps) {
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [savedImageUrls, setSavedImageUrls] = useState<string[]>([]);
+
+  const handleFileChange = (result: CloudinaryUploadResult) => {
+    if (result.event === "success") {
+      const uploadInfo = result.info;
+      const newUrl = uploadInfo.secure_url;
+
+      setImageUrls((prev) => {
+        const updatedUrls = [...prev, newUrl];
+        setSavedImageUrls((prevSaved) => {
+          if (!prevSaved.includes(newUrl)) {
+            return [...prevSaved, newUrl];
+          }
+          return prevSaved;
+        });
+        onImageUpload(updatedUrls);
+        return updatedUrls;
+      });
+    }
+  };
+
+  const handleDeleteImage = (indexToDelete: number) => {
+    const imageUrlToDelete = imageUrls[indexToDelete];
+    const markdownImageString = `![Image](${imageUrlToDelete})`;
+
+    setContent(content.replace(markdownImageString, ""));
+    const updatedUrls = imageUrls.filter((_, index) => index !== indexToDelete);
+    setImageUrls(updatedUrls);
+
+    onImageUpload(updatedUrls);
+  };
+
+  const insertImagesToMarkdown = () => {
+    const newMarkdownContent = imageUrls
+      .map((url) => `\n![Image](${url})`)
+      .join("");
+    setContent(content + newMarkdownContent);
+  };
+
   const handleTagChange = (tagId: string) => {
     const isSelected = selectedTags.includes(tagId);
     const updatedTags = isSelected
       ? selectedTags.filter((id) => id !== tagId)
       : [...selectedTags, tagId];
     setSelectedTags(updatedTags);
+  };
+
+  const handleSave = () => {
+    const blogPostData = {
+      title,
+      content,
+      tags: selectedTags,
+      images: savedImageUrls,
+    };
+    onSave(blogPostData);
   };
 
   return (
@@ -42,7 +119,6 @@ function BlogEditor({
           height: "100%",
         }}
       >
-        {/* Left Column */}
         <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
           <TextField
             label="Title"
@@ -70,21 +146,95 @@ function BlogEditor({
                 color={selectedTags.includes(tag.id) ? "primary" : "default"}
                 onClick={() => handleTagChange(tag.id)}
                 variant={selectedTags.includes(tag.id) ? "filled" : "outlined"}
-                sx={{
-                  cursor: "pointer",
-                }}
+                sx={{ cursor: "pointer" }}
               />
             ))}
           </Box>
+
+          <Box sx={{ mt: 3 }}>
+            <Typography variant="body1" gutterBottom>
+              Upload Images:
+            </Typography>
+
+            <CldUploadWidget
+              uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET}
+              onSuccess={(result: any) => handleFileChange(result)}
+            >
+              {({ open }) => {
+                return (
+                  <Button
+                    variant="outlined"
+                    onClick={() => open()}
+                    sx={{ mb: 2 }}
+                  >
+                    Upload an Image
+                  </Button>
+                );
+              }}
+            </CldUploadWidget>
+
+            {imageUrls.length > 0 && (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="body2" gutterBottom>
+                  Uploaded Images:
+                </Typography>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+                  {imageUrls.map((url, index) => (
+                    <Box
+                      key={index}
+                      sx={{
+                        maxWidth: "150px",
+                        textAlign: "center",
+                        position: "relative",
+                      }}
+                    >
+                      <IconButton
+                        size="small"
+                        onClick={() => handleDeleteImage(index)}
+                        sx={{
+                          position: "absolute",
+                          right: -10,
+                          top: -10,
+                          bgcolor: "background.paper",
+                          "&:hover": {
+                            bgcolor: "error.light",
+                            color: "white",
+                          },
+                        }}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                      <img
+                        src={url}
+                        alt={`Preview ${index}`}
+                        style={{ width: "100%", marginBottom: "8px" }}
+                      />
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          wordWrap: "break-word",
+                          whiteSpace: "pre-wrap",
+                        }}
+                      >
+                        {url}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  sx={{ mt: 1 }}
+                  onClick={insertImagesToMarkdown}
+                >
+                  Insert Images into Markdown
+                </Button>
+              </Box>
+            )}
+          </Box>
         </Box>
 
-        {/* Right Column */}
-        <Box
-          sx={{
-            flex: 1,
-            overflow: "auto",
-          }}
-        >
+        <Box sx={{ flex: 1, overflow: "auto" }}>
           <Paper
             elevation={3}
             sx={{
@@ -105,10 +255,9 @@ function BlogEditor({
         </Box>
       </Box>
 
-      {/* Save Button */}
       <Box sx={{ textAlign: "center", mt: 3 }}>
         <Button
-          onClick={onSave}
+          onClick={handleSave}
           variant="contained"
           color="primary"
           sx={{
