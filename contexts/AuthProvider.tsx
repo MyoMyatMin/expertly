@@ -48,25 +48,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const clearError = () => setError(null);
 
   const checkUser = async () => {
-    // setLoading(true);
-    // clearError();
+    setLoading(true);
+    clearError();
 
-    // try {
-    //   const response = await api.protected.getMe();
-    //   setUser(response.user);
-    // } catch (err: any) {
-    //   console.error("Error fetching user:", err);
-    //   setUser(null);
+    try {
+      const response = await api.protected.getMe();
+      console.log("User fetched:", response);
+      setUser(response.user);
+    } catch (err: any) {
+      console.log("Here is auth context");
+      console.error("Error fetching user:", err);
+      setUser(null);
 
-    //   // Only redirect to signin if not already on auth pages
-    //   const currentPath = window.location.pathname;
-    //   if (!currentPath.startsWith("/auth/")) {
-    //     router.push("/auth/signin");
-    //   }
-    // } finally {
-    //   setLoading(false);
-    // }
-    loadDummyUser();
+      // Only redirect to signin if not already on auth pages
+      const currentPath = window.location.pathname;
+      if (!currentPath.startsWith("/auth/")) {
+        router.push("/auth/signin");
+      }
+    } finally {
+      setLoading(false);
+    }
+    //loadDummyUser();
   };
 
   useEffect(() => {

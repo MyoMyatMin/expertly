@@ -1,6 +1,16 @@
 "use client";
 import React, { useState } from "react";
-import { Box, Typography, Avatar, Button, TextField, Tabs, Tab, Paper, } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Avatar,
+  Button,
+  TextField,
+  Tabs,
+  Tab,
+  Paper,
+} from "@mui/material";
+import withAuth from "../hocs/withAuth";
 
 type Props = {};
 
@@ -37,7 +47,11 @@ const Profile: React.FC<Props> = () => {
   };
 
   const handleAppealSubmit = () => {
-    console.log("Appeal Submitted:", { appealName, reportDetail, justification });
+    console.log("Appeal Submitted:", {
+      appealName,
+      reportDetail,
+      justification,
+    });
     setAppealName("");
     setReportDetail("");
     setJustification("");
@@ -51,15 +65,15 @@ const Profile: React.FC<Props> = () => {
           {isEditing ? (
             <Box>
               <Avatar
-                src={newProfilePic ? URL.createObjectURL(newProfilePic) : profilePic}
+                src={
+                  newProfilePic
+                    ? URL.createObjectURL(newProfilePic)
+                    : profilePic
+                }
                 alt="Profile Pic"
                 sx={{ width: 120, height: 120, mx: "auto", mb: 2 }}
               />
-              <Button
-                variant="outlined"
-                component="label"
-                sx={{ mb: 2 }}
-              >
+              <Button variant="outlined" component="label" sx={{ mb: 2 }}>
                 Upload New Picture
                 <input type="file" hidden onChange={handleFileChange} />
               </Button>
@@ -123,7 +137,9 @@ const Profile: React.FC<Props> = () => {
           </Tabs>
           <Box sx={{ p: 2 }}>
             {tabValue === 0 && (
-              <Typography variant="body1">You are not following anyone yet.</Typography>
+              <Typography variant="body1">
+                You are not following anyone yet.
+              </Typography>
             )}
             {tabValue === 1 && (
               <Typography variant="body1">No saved posts yet.</Typography>
