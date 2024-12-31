@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import {
   Box,
@@ -28,15 +28,8 @@ interface BlogEditorProps {
   setTitle: (title: string) => void;
   content: string;
   setContent: (content: string) => void;
-  selectedTags: string[];
-  setSelectedTags: (selectedTags: string[]) => void;
-  tags: { id: string; name: string }[];
-  onSave: (data: {
-    title: string;
-    content: string;
-    tags: string[];
-    images: string[];
-  }) => void;
+
+  onSave: (data: { title: string; content: string; images: string[] }) => void;
   onImageUpload: (urls: string[]) => void;
 }
 
@@ -45,9 +38,6 @@ function BlogEditor({
   setTitle,
   content = "",
   setContent,
-  selectedTags = [],
-  setSelectedTags,
-  tags = [],
   onSave = () => {},
   onImageUpload = () => {},
 }: BlogEditorProps) {
@@ -67,11 +57,15 @@ function BlogEditor({
           }
           return prevSaved;
         });
-        onImageUpload(updatedUrls);
         return updatedUrls;
       });
     }
   };
+
+  useEffect(() => {
+    // Call onImageUpload when imageUrls updates
+    onImageUpload(imageUrls);
+  }, [imageUrls, onImageUpload]);
 
   const handleDeleteImage = (indexToDelete: number) => {
     const imageUrlToDelete = imageUrls[indexToDelete];
@@ -80,8 +74,6 @@ function BlogEditor({
     setContent(content.replace(markdownImageString, ""));
     const updatedUrls = imageUrls.filter((_, index) => index !== indexToDelete);
     setImageUrls(updatedUrls);
-
-    onImageUpload(updatedUrls);
   };
 
   const insertImagesToMarkdown = () => {
@@ -91,19 +83,10 @@ function BlogEditor({
     setContent(content + newMarkdownContent);
   };
 
-  const handleTagChange = (tagId: string) => {
-    const isSelected = selectedTags.includes(tagId);
-    const updatedTags = isSelected
-      ? selectedTags.filter((id) => id !== tagId)
-      : [...selectedTags, tagId];
-    setSelectedTags(updatedTags);
-  };
-
   const handleSave = () => {
     const blogPostData = {
       title,
       content,
-      tags: selectedTags,
       images: savedImageUrls,
     };
     onSave(blogPostData);
@@ -137,19 +120,6 @@ function BlogEditor({
             value={content}
             onChange={(e) => setContent(e.target.value)}
           />
-
-          <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-            {tags.map((tag) => (
-              <Chip
-                key={tag.id}
-                label={tag.name}
-                color={selectedTags.includes(tag.id) ? "primary" : "default"}
-                onClick={() => handleTagChange(tag.id)}
-                variant={selectedTags.includes(tag.id) ? "filled" : "outlined"}
-                sx={{ cursor: "pointer" }}
-              />
-            ))}
-          </Box>
 
           <Box sx={{ mt: 3 }}>
             <Typography variant="body1" gutterBottom>
