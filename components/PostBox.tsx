@@ -3,6 +3,7 @@ import React from "react";
 import { Card, CardContent, Typography, Box, IconButton } from "@mui/material";
 import { ThumbUp, Comment, Report, Bookmark } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
+import ReactMarkdown from "react-markdown";
 
 type PostProps = {
   id: string;
@@ -32,14 +33,17 @@ const Post = ({
   const router = useRouter();
 
   return (
-    <Card sx={{ mb: 2, cursor: "pointer" }} onClick={() => router.push("/posts/" + post.id)}>
+    <Card
+      sx={{ mb: 2, cursor: "pointer" }}
+      onClick={() => router.push("/posts/" + post.id)}
+    >
       <CardContent>
         <Typography variant="h6" sx={{ fontWeight: 600 }}>
           {post.title}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          {post.content.substring(0, 100)}...
-        </Typography>
+
+        <ReactMarkdown>{`${post.content.substring(0, 100)}...`}</ReactMarkdown>
+
         <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
           <Box>
             <IconButton

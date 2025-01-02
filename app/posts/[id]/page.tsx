@@ -1,15 +1,23 @@
 "use client";
 import React, { useState } from "react";
-import { Box, Typography, Avatar, Button, IconButton, TextField, Divider, Paper, } from "@mui/material";
+import ReactMarkdown from "react-markdown";
+import {
+  Box,
+  Typography,
+  Avatar,
+  Button,
+  IconButton,
+  Divider,
+  Paper,
+  TextField,
+} from "@mui/material";
 import { ThumbUp, Comment, Edit, Delete } from "@mui/icons-material";
+import { getPost } from "@/helper/getDummyData";
 
 type Props = {};
 
 const PostDetail = (props: Props) => {
-  const [title, setTitle] = useState("How to Become a pro like M3");
-  const [body] = useState(
-    "This post explains how to build a Medium-like application with React and Material-UI. You will learn about components, state management, and styling. Feel free to further customize the form with additional validations or styles according to your applications needs! If you have any questions or need further modifications, let me know!This tutorial will guide you step by step. Lets dive in! If you still experience issues after this, please provide more context by including the relevant sections of your package.json, vite.config.ts, and any other files that seem related, which will help narrow down the problem further."
-  );
+  const post = getPost();
   const [isEditing, setIsEditing] = useState(false);
   const [showFullBody, setShowFullBody] = useState(false);
   const [comments, setComments] = useState<string[]>([
@@ -40,24 +48,25 @@ const PostDetail = (props: Props) => {
   return (
     <>
       <Box sx={{ maxWidth: 1000, mx: "auto", mt: 4, px: 2 }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-          {isEditing ? (
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="Edit Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              sx={{ mr: 2 }}
-            />
-          ) : (
-            <Typography variant="h4" sx={{ fontWeight: 700 }}>
-              {title}
-            </Typography>
-          )}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 2,
+          }}
+        >
+          <Typography variant="h4" sx={{ fontWeight: 700 }}>
+            The Serene Beauty of Nature: A Visual Journey Through Architectural
+            Elements
+          </Typography>
           <Box>
             {isEditing ? (
-              <Button variant="contained" color="primary" onClick={handleSaveEdit}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSaveEdit}
+              >
                 Save
               </Button>
             ) : (
@@ -83,18 +92,29 @@ const PostDetail = (props: Props) => {
           </Box>
         </Box>
 
-        <Typography variant="body1" sx={{ mb: 2 }}>
-          {showFullBody ? body : `${body.substring(0, 300)}...`}
-          {body.length > 300 && (
-            <Button size="small" onClick={() => setShowFullBody((prev) => !prev)}>
-              {showFullBody ? "Read Less" : "Read More"}
-            </Button>
+        <Box sx={{ mb: 2 }}>
+          {showFullBody ? (
+            <ReactMarkdown>{post.content}</ReactMarkdown>
+          ) : (
+            <ReactMarkdown>{`${post.content.substring(
+              0,
+              300
+            )}...`}</ReactMarkdown>
           )}
-        </Typography>
+          <Button size="small" onClick={() => setShowFullBody((prev) => !prev)}>
+            {showFullBody ? "Read Less" : "Read More"}
+          </Button>
+        </Box>
 
         <Divider sx={{ my: 2 }} />
 
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Box>
             <IconButton>
               <ThumbUp />
