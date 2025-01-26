@@ -62,19 +62,19 @@ const AppealDetails = (props: Props) => {
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
         <Box sx={{ borderBottom: "2px solid #ccc", pb: 2 }}>
-          <Typography variant="h6">Report Details: {appeal.reason}</Typography>
+          <Typography><strong>Report Details:</strong> {appeal.reason}</Typography>
         </Box>
 
         <Box sx={{ borderBottom: "2px solid #ccc", pb: 2 }}>
-          <Typography variant="h6">Reported Comments: {appeal.reportedComment}</Typography>
+          <Typography><strong>Reported Comments:</strong> {appeal.reportedComment}</Typography>
         </Box>
 
         <Box sx={{ borderBottom: "2px solid #ccc", pb: 2 }}>
-          <Typography variant="h6">Justification: {appeal.justification}</Typography>
+          <Typography><strong>Justification:</strong> {appeal.justification}</Typography>
         </Box>
 
         <Box sx={{ borderBottom: "2px solid #ccc", pb: 2 }}>
-          <Typography variant="h6">Post/Comment Link: {appeal.postLink}</Typography>
+          <Typography><strong>Post/Comment Link:</strong> {appeal.postLink}</Typography>
         </Box>
       </Box>
 

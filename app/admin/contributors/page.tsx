@@ -1,20 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import {
-  Tabs,
-  Tab,
-  Box,
-  Container,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Avatar,
-  Button,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import { Tabs, Tab, Box, Container, Table, TableBody, TableCell, TableHead, TableRow, Avatar, Button, useMediaQuery, useTheme, } from "@mui/material";
 import { useRouter } from "next/navigation";
 
 type Report = {
@@ -114,11 +100,11 @@ const ManageContributors = (props: Props) => {
             >
               <TableHead>
                 <TableRow>
-                  <TableCell>Profile</TableCell>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Post Link</TableCell>
-                  <TableCell>Reason</TableCell>
-                  <TableCell>Action</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Profile</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Name</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Post Link</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Reason</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -156,12 +142,12 @@ const ManageContributors = (props: Props) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Profile</TableCell>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Post Link</TableCell>
-                    <TableCell>Reason</TableCell>
-                    <TableCell>Justification</TableCell>
-                    <TableCell>Action</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Profile</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Name</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Post Link</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Reason</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Justification</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>

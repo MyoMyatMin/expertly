@@ -60,21 +60,19 @@ const ContributorDetail = () => {
           <img
             src={contributor.citizenCard}
             alt="Citizen Card"
-            style={{ width: "100%", maxWidth: "400px", borderRadius: "8px" }}
+            style={{ width: "100%", maxWidth: "300px", borderRadius: "8px" }}
           />
         </Box>
 
         <Box sx={{ textAlign: "left", width: "100%", maxWidth: "400px" }}>
           <Box sx={{ borderBottom: "2px solid #ccc", pb: 2, mb: 2 }}>
-            <Typography variant="h6">Name: {contributor.name}</Typography>
+            <Typography><strong>Name:</strong> {contributor.name}</Typography>
           </Box>
           <Box sx={{ borderBottom: "2px solid #ccc", pb: 2, mb: 2 }}>
-            <Typography variant="h6">Email: {contributor.email}</Typography>
+            <Typography><strong>Email:</strong> {contributor.email}</Typography>
           </Box>
           <Box sx={{ borderBottom: "2px solid #ccc", pb: 2, mb: 2 }}>
-            <Typography variant="h6">
-              Expertise: {contributor.expertise}
-            </Typography>
+            <Typography><strong>Expertise:</strong> {contributor.expertise}</Typography>
           </Box>
         </Box>
       </Box>

@@ -1,14 +1,6 @@
 "use client";
 import React from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Button,
-} from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, } from "@mui/material";
 import { useRouter } from "next/navigation";
 
 type Contributor = {
@@ -48,10 +40,10 @@ const Applications: React.FC = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell align="center">Name</TableCell>
-              <TableCell align="center">Email</TableCell>
-              <TableCell align="center">Phone</TableCell>
-              <TableCell align="center">Actions</TableCell>
+              <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '1rem' }}>Name</TableCell>
+              <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '1rem' }}>Email</TableCell>
+              <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '1rem' }}>Phone</TableCell>
+              <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '1rem' }}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
