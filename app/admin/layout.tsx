@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation"; // For active route highlighting
+import { usePathname } from "next/navigation";
 
 // Define the navigation links for the Admin section
 const navLinks = [
@@ -19,25 +19,31 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <div
-      style={{ display: "flex", minHeight: "100vh", flexDirection: "column" }}
-    >
-      {/* Navigation Bar */}
-      <nav
+    <div style={{ display: "flex", minHeight: "100vh" }}>
+      {/* Sidebar Navigation */}
+      <aside
         style={{
-          backgroundColor: "#333",
+          flexShrink: 0,
+          width: "250px",
+          backgroundColor: "#f8f9fa", //#f8f9fa
           color: "white",
-          padding: "10px 20px",
+          padding: "20px",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        <ul style={{ listStyleType: "none", display: "flex", gap: "20px" }}>
+        <ul style={{ listStyleType: "none", padding: 0, margin: 0 }}>
           {navLinks.map((link) => (
-            <li key={link.href}>
+            <li key={link.href} style={{ marginBottom: "10px" }}>
               <Link
                 href={link.href}
                 style={{
-                  color: pathname === link.href ? "yellow" : "white", // Highlight active link
+                  color: pathname === link.href ? "#ff006e" : "black", 
                   textDecoration: "none",
+                  padding: "10px",
+                  display: "block",
+                  borderRadius: "5px",
+                  fontSize: "1.1rem",
                 }}
               >
                 {link.label}
@@ -45,22 +51,23 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
             </li>
           ))}
         </ul>
-      </nav>
+      </aside>
+
+      <div
+        style={{
+          width: "0.5px",
+          backgroundColor: "#E0E0E0", 
+          flexShrink: 0, 
+        }}
+      ></div>
 
       {/* Main Content */}
-      <main style={{ padding: "20px", flexGrow: 1 }}>{children}</main>
-
-      {/* Footer */}
-      <footer
+      <div
         style={{
-          backgroundColor: "#333",
-          color: "white",
-          textAlign: "center",
-          padding: "10px",
+          flexGrow: 1, // Let the main content take up the remaining space
+          overflow: "auto", // Ensure scrollability if content overflows
         }}
-      >
-        Admin Panel © 2024
-      </footer>
+      >{children}</div>
     </div>
   );
 };

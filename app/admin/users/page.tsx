@@ -64,7 +64,6 @@ const UsersAction = (props: Props) => {
         <Tabs
           value={tabValue}
           onChange={handleTabChange}
-          centered={!isSmallScreen}
           variant={isSmallScreen ? "scrollable" : "standard"}
           scrollButtons="auto"
         >

@@ -36,7 +36,7 @@ const Applications: React.FC = () => {
 
   return (
     <div>
-      <TableContainer>
+      <TableContainer >
         <Table>
           <TableHead>
             <TableRow>
