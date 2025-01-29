@@ -1,5 +1,9 @@
+import { title } from "process";
+
 export const getPost = () => {
   return {
+    id: "1",
+    title: "The Serene Beauty of Nature: A Visual Journey Through Architectural Elements",
     content: `
  # The Serene Beauty of Nature: A Visual Journey Through Architectural Elements
 

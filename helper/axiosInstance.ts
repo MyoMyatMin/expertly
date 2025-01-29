@@ -123,8 +123,18 @@ export const api = {
       const response = await privateApi.post("/posts", data);
       return response.data;
     },
+    updatePost: async (data: {
+      id: string; 
+      title: string;
+      content: string;
+      images: string[];
+    }) => {
+      const response = await privateApi.put(`/posts/${data.id}`, data); 
+      return response.data;
+    },
 
     // ... rest of protected endpoints remain the same
+    
   },
 };
 
