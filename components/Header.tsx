@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useContext } from "react";
 import {
   AppBar,
@@ -40,8 +41,11 @@ const Header: React.FC = () => {
     setAnchorEl(null);
   };
 
+  const isSuperAdmin = user?.Role.String === "superadmin";
   const isAdmin =
     user?.Role.String === "superadmin" || user?.Role.String === "moderator";
+  const isContributor = user?.Role.String === "contributor";
+  const isRegularUser = !isAdmin && !isContributor;
 
   const renderMobileMenuItems = () => {
     if (!user) {
@@ -55,7 +59,7 @@ const Header: React.FC = () => {
 
     const menuItems = [];
 
-    if (user.Role.String === "contributor") {
+    if (isSuperAdmin) {
       menuItems.push(
         <MenuItem key="create" onClick={() => router.push("/create")}>
           <Add sx={{ mr: 1 }} />
@@ -72,6 +76,18 @@ const Header: React.FC = () => {
         >
           <AdminPanelSettings sx={{ mr: 1 }} />
           Admin
+        </MenuItem>
+      );
+    }
+
+    if (isRegularUser) {
+      menuItems.push(
+        <MenuItem
+          key="to-contributor"
+          onClick={() => router.push("/applicationform")}
+        >
+          <Add sx={{ mr: 1 }} />
+          To Contributor
         </MenuItem>
       );
     }
@@ -103,7 +119,8 @@ const Header: React.FC = () => {
           Expertly
         </Typography>
 
-        {!isMobile && (
+        {/* Remove Search Bar if Admin */}
+        {!isMobile && !isAdmin && (
           <TextField
             variant="outlined"
             size="small"
@@ -134,20 +151,15 @@ const Header: React.FC = () => {
             </Menu>
           </>
         ) : (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-            }}
-          >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             {user ? (
               <>
-                {user.Role.String === "contributor" && (
+                {/* Show "Create" button only for superadmin */}
+                {isSuperAdmin && (
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => router.push("/posts/create")}
+                    onClick={() => router.push("/create")}
                     startIcon={<Add />}
                     sx={{ height: "40px" }}
                   >
@@ -163,6 +175,17 @@ const Header: React.FC = () => {
                     sx={{ height: "40px" }}
                   >
                     Admin
+                  </Button>
+                )}
+                {isRegularUser && (
+                  <Button
+                    variant="contained"
+                    color="info"
+                    onClick={() => router.push("/applicationform")}
+                    startIcon={<Add />}
+                    sx={{ height: "40px" }}
+                  >
+                    To Contributor
                   </Button>
                 )}
                 <AccountCircle
