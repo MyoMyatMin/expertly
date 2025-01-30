@@ -1,6 +1,20 @@
 "use client";
 import React, { useState } from "react";
-import { Tabs, Tab, Box, Container, Table, TableBody, TableCell, TableHead, TableRow, Avatar, Button, useMediaQuery, useTheme, } from "@mui/material";
+import {
+  Tabs,
+  Tab,
+  Box,
+  Container,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Avatar,
+  Button,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { useRouter } from "next/navigation";
 
 type Props = {};
@@ -18,7 +32,7 @@ const UsersAction = (props: Props) => {
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREOme6vZXapI-HTNJXRwstlO_vjjF59Wt6cQ&s",
       name: "John Doe",
       postLink: "https://www.expertly.com/7670&set=pcb.169272",
-      reportedComment: "Nice tits nigga suck my dick",
+      reportedComment: "Hi there.",
       reason: "Harassment",
     },
     {
@@ -27,7 +41,7 @@ const UsersAction = (props: Props) => {
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTNjkaQHLXfokbl1GiKnXl6v7GNgnG8rb3JA&s",
       name: "Jane Smith",
       postLink: "https://www.expertly.com/?fbid=169272510490",
-      reportedComment: "The earth is flat and u r shit",
+      reportedComment: "The earth is flat",
       reason: "Misinformation",
     },
   ];
@@ -77,12 +91,24 @@ const UsersAction = (props: Props) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Profile</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Name</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Post Link</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Reported Comments</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Reason</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Action</TableCell>
+                    <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
+                      Profile
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
+                      Name
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
+                      Post Link
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
+                      Reported Comments
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
+                      Reason
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
+                      Action
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -126,12 +152,24 @@ const UsersAction = (props: Props) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Profile</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Name</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Post Link</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Reason</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Justification</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', fontSize: '15px' }}>Action</TableCell>
+                    <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
+                      Profile
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
+                      Name
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
+                      Post Link
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
+                      Reason
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
+                      Justification
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
+                      Action
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -140,10 +178,10 @@ const UsersAction = (props: Props) => {
                       <TableCell>
                         <Avatar src={appeal.profileImage} alt={appeal.name} />
                       </TableCell>
-                      <TableCell >{appeal.name}</TableCell>
-                      <TableCell >{appeal.postLink}</TableCell>
-                      <TableCell >{appeal.reason}</TableCell>
-                      <TableCell >{appeal.justification}</TableCell>
+                      <TableCell>{appeal.name}</TableCell>
+                      <TableCell>{appeal.postLink}</TableCell>
+                      <TableCell>{appeal.reason}</TableCell>
+                      <TableCell>{appeal.justification}</TableCell>
                       <TableCell>
                         <Button
                           variant="contained"

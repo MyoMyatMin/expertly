@@ -1,15 +1,12 @@
 "use client";
 import React, { useState } from "react";
-import { Box, Typography, TextField, Button, Grid, IconButton } from "@mui/material";
+import { Box, Typography, TextField, Button, IconButton } from "@mui/material";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import SendIcon from "@mui/icons-material/Send";
 
 type Props = {};
 
 const ApplicationForm = (props: Props) => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [expertiseLink, setExpertiseLink] = useState("");
   const [identityProof, setIdentityProof] = useState<File | null>(null);
   const [submission, setSubmission] = useState("");
@@ -25,9 +22,6 @@ const ApplicationForm = (props: Props) => {
 
   const handleSubmit = () => {
     console.log({
-      name,
-      email,
-      phone,
       expertiseLink,
       identityProof,
       submission,
@@ -37,7 +31,10 @@ const ApplicationForm = (props: Props) => {
 
   return (
     <Box sx={{ maxWidth: 800, mx: "auto", mt: 4, px: 2 }}>
-      <Typography variant="h4" sx={{ mb: 4, fontWeight: 700, textAlign: "center" }}>
+      <Typography
+        variant="h4"
+        sx={{ mb: 4, fontWeight: 700, textAlign: "center" }}
+      >
         Contributor Application Form
       </Typography>
 
@@ -46,29 +43,8 @@ const ApplicationForm = (props: Props) => {
       </Typography>
       <TextField
         fullWidth
-        placeholder="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        sx={{ mb: 4 }}
-      />
-
-      <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-        Contact Info:
-      </Typography>
-      <TextField
-        fullWidth
-        label="Email"
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        sx={{ mb: 2 }}
-      />
-      <TextField
-        fullWidth
-        label="Phone Number"
-        type="tel"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
+        value="John Doe"
+        InputProps={{ readOnly: true }}
         sx={{ mb: 4 }}
       />
 

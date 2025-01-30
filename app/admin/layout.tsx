@@ -38,7 +38,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
               <Link
                 href={link.href}
                 style={{
-                  color: pathname === link.href ? "#ff006e" : "black", 
+                  color: pathname === link.href ? "#ff006e" : "black",
                   textDecoration: "none",
                   padding: "10px",
                   display: "block",
@@ -56,8 +56,8 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       <div
         style={{
           width: "0.5px",
-          backgroundColor: "#E0E0E0", 
-          flexShrink: 0, 
+          backgroundColor: "#E0E0E0",
+          flexShrink: 0,
         }}
       ></div>
 
@@ -67,7 +67,9 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           flexGrow: 1, // Let the main content take up the remaining space
           overflow: "auto", // Ensure scrollability if content overflows
         }}
-      >{children}</div>
+      >
+        {children}
+      </div>
     </div>
   );
 };

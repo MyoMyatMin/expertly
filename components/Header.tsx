@@ -66,7 +66,10 @@ const Header: React.FC = () => {
 
     if (isAdmin) {
       menuItems.push(
-        <MenuItem key="admin" onClick={() => router.push("/admin")}>
+        <MenuItem
+          key="admin"
+          onClick={() => router.push("/admin/contributors")}
+        >
           <AdminPanelSettings sx={{ mr: 1 }} />
           Admin
         </MenuItem>
@@ -155,7 +158,7 @@ const Header: React.FC = () => {
                   <Button
                     variant="contained"
                     color="secondary"
-                    onClick={() => router.push("/admin")}
+                    onClick={() => router.push("/admin/contributors")}
                     startIcon={<AdminPanelSettings />}
                     sx={{ height: "40px" }}
                   >
