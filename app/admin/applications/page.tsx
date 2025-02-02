@@ -1,6 +1,14 @@
 "use client";
 import React from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, } from "@mui/material";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Button,
+} from "@mui/material";
 import { useRouter } from "next/navigation";
 
 type Contributor = {
@@ -36,14 +44,34 @@ const Applications: React.FC = () => {
 
   return (
     <div>
-      <TableContainer >
+      <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '1rem' }}>Name</TableCell>
-              <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '1rem' }}>Email</TableCell>
-              <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '1rem' }}>Phone</TableCell>
-              <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '1rem' }}>Actions</TableCell>
+              <TableCell
+                align="center"
+                sx={{ fontWeight: "bold", fontSize: "1rem" }}
+              >
+                Name
+              </TableCell>
+              <TableCell
+                align="center"
+                sx={{ fontWeight: "bold", fontSize: "1rem" }}
+              >
+                Email
+              </TableCell>
+              {/* <TableCell
+                align="center"
+                sx={{ fontWeight: "bold", fontSize: "1rem" }}
+              >
+                Phone
+              </TableCell> */}
+              <TableCell
+                align="center"
+                sx={{ fontWeight: "bold", fontSize: "1rem" }}
+              >
+                Actions
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -51,7 +79,7 @@ const Applications: React.FC = () => {
               <TableRow key={contributor.id}>
                 <TableCell align="center">{contributor.name}</TableCell>
                 <TableCell align="center">{contributor.email}</TableCell>
-                <TableCell align="center">{contributor.phone}</TableCell>
+                {/* <TableCell align="center">{contributor.phone}</TableCell> */}
                 <TableCell align="center">
                   <Button
                     variant="outlined"

@@ -1,6 +1,19 @@
 "use client";
 import React, { useState } from "react";
-import { Container, Typography, Box, TextField, Button,MenuItem, Table, TableHead, TableRow, TableCell, TableBody, Paper, } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Box,
+  TextField,
+  Button,
+  MenuItem,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Paper,
+} from "@mui/material";
 
 type Admin = {
   name: string;
@@ -10,14 +23,18 @@ type Admin = {
 
 const AdminPanel = () => {
   const [formData, setFormData] = useState({
-      name: "",
-      email: "",
-      password: "",
-      role: "moderator",
-    });
+    name: "",
+    email: "",
+    password: "",
+    role: "moderator",
+  });
   const [admins, setAdmins] = useState<Admin[]>([
     { name: "Jackie Chan", email: "jackie.chan@example.com", role: "Admin" },
-    { name: "Lana Del Ray", email: "lana.delray@example.com", role: "Moderator" },
+    {
+      name: "Lana Del Ray",
+      email: "lana.delray@example.com",
+      role: "Moderator",
+    },
   ]);
 
   const [newAdmin, setNewAdmin] = useState<Admin>({
@@ -47,7 +64,7 @@ const AdminPanel = () => {
     <Container maxWidth="md" sx={{ mt: 5 }}>
       <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
         <Typography variant="h6" sx={{ mb: 2 }}>
-          Create New Admin
+          Create New Admin or Moderators
         </Typography>
         <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
           <TextField
@@ -97,9 +114,15 @@ const AdminPanel = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell><strong>Name</strong></TableCell>
-              <TableCell><strong>Email</strong></TableCell>
-              <TableCell><strong>Role</strong></TableCell>
+              <TableCell>
+                <strong>Name</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Email</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Role</strong>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
