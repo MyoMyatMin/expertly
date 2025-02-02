@@ -24,6 +24,7 @@ import {
 } from "@mui/icons-material";
 import { useMediaQuery, useTheme } from "@mui/material";
 import AuthContext from "@/contexts/AuthProvider";
+import Post from "@/components/PostBox";
 
 const Header: React.FC = () => {
   const { user, logout } = useContext(AuthContext);
@@ -45,6 +46,7 @@ const Header: React.FC = () => {
   const isAdmin =
     user?.Role.String === "superadmin" || user?.Role.String === "moderator";
   const isContributor = user?.Role.String === "contributor";
+  console.log("User Role:", user?.Role.String, isContributor);
   const isRegularUser = !isAdmin && !isContributor;
 
   const renderMobileMenuItems = () => {
@@ -64,6 +66,15 @@ const Header: React.FC = () => {
         <MenuItem key="create" onClick={() => router.push("/create")}>
           <Add sx={{ mr: 1 }} />
           Create
+        </MenuItem>
+      );
+    }
+
+    if (isContributor) {
+      menuItems.push(
+        <MenuItem key="createpost" onClick={() => router.push("/posts/create")}>
+          <Add sx={{ mr: 1 }} />
+          Create Post
         </MenuItem>
       );
     }
@@ -186,6 +197,17 @@ const Header: React.FC = () => {
                     sx={{ height: "40px" }}
                   >
                     To Contributor
+                  </Button>
+                )}
+                {isContributor && (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => router.push("/posts/create")}
+                    startIcon={<Add />}
+                    sx={{ height: "40px" }}
+                  >
+                    Create Post
                   </Button>
                 )}
                 <AccountCircle
