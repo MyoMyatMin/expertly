@@ -159,7 +159,7 @@ const Header: React.FC = () => {
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => router.push("/create")}
+                    onClick={() => router.push("/admin/panel")}
                     startIcon={<Add />}
                     sx={{ height: "40px" }}
                   >

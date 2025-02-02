@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Container, Typography, Box, TextField, Button, Table, TableHead, TableRow, TableCell, TableBody, Paper, } from "@mui/material";
+import { Container, Typography, Box, TextField, Button,MenuItem, Table, TableHead, TableRow, TableCell, TableBody, Paper, } from "@mui/material";
 
 type Admin = {
   name: string;
@@ -9,9 +9,15 @@ type Admin = {
 };
 
 const AdminPanel = () => {
+  const [formData, setFormData] = useState({
+      name: "",
+      email: "",
+      password: "",
+      role: "moderator",
+    });
   const [admins, setAdmins] = useState<Admin[]>([
-    { name: "Jackie Chan", email: "jackie.chan@example.com", role: "Super Admin" },
-    { name: "Lana Del Ray", email: "lana.delray@example.com", role: "Admin" },
+    { name: "Jackie Chan", email: "jackie.chan@example.com", role: "Admin" },
+    { name: "Lana Del Ray", email: "lana.delray@example.com", role: "Moderator" },
   ]);
 
   const [newAdmin, setNewAdmin] = useState<Admin>({
@@ -24,6 +30,7 @@ const AdminPanel = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewAdmin((prev) => ({ ...prev, [name]: value }));
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   // Handle form submission
@@ -60,13 +67,17 @@ const AdminPanel = () => {
             variant="outlined"
           />
           <TextField
+            fullWidth
+            select
             label="Role"
             name="role"
-            value={newAdmin.role}
+            value={formData.role}
             onChange={handleChange}
-            fullWidth
-            variant="outlined"
-          />
+            margin="normal"
+          >
+            <MenuItem value="Admin">Admin</MenuItem>
+            <MenuItem value="moderator">Moderator</MenuItem>
+          </TextField>
           <Button
             variant="contained"
             color="primary"

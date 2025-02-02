@@ -138,7 +138,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       Name: "MMM",
       Email: "mmm@gmail.com",
       Role: {
-        String: "user",
+        String: "superadmin",
         Valid: true,
       },
       SuspendedUntil: {
