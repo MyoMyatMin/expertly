@@ -7,6 +7,7 @@ import SendIcon from "@mui/icons-material/Send";
 type Props = {};
 
 const ApplicationForm = (props: Props) => {
+  const [name, setName] = useState("");
   const [expertiseLink, setExpertiseLink] = useState("");
   const [identityProof, setIdentityProof] = useState<File | null>(null);
   const [submission, setSubmission] = useState("");
@@ -43,8 +44,9 @@ const ApplicationForm = (props: Props) => {
       </Typography>
       <TextField
         fullWidth
-        value="John Doe"
-        InputProps={{ readOnly: true }}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Enter your name"
         sx={{ mb: 4 }}
       />
 
