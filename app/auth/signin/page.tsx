@@ -1,6 +1,15 @@
 "use client";
 import React, { useState, useContext } from "react";
-import { Box, TextField, Button, Typography, Paper, Link } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  Link,
+  FormControlLabel,
+  Switch,
+} from "@mui/material";
 import { useRouter } from "next/navigation";
 import AuthContext from "@/contexts/AuthProvider";
 
@@ -13,17 +22,21 @@ const SignIn: React.FC = () => {
     password: "",
   });
 
+  const [isModerator, setIsModerator] = useState(false);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleSwitchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsModerator(e.target.checked);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Signin form submitted:", formData);
+    console.log("Signin form submitted:", formData, "Moderator:", isModerator);
     try {
-      console.log("Signin form submitted:", formData);
-      await signin(formData.email, formData.password);
-      router.push("/profile");
+      await signin(formData.email, formData.password, isModerator);
     } catch (err) {
       console.error("Error during signin:", err);
     }
@@ -73,13 +86,18 @@ const SignIn: React.FC = () => {
             onChange={handleChange}
             variant="outlined"
           />
+          <FormControlLabel
+            control={
+              <Switch checked={isModerator} onChange={handleSwitchChange} />
+            }
+            label="Sign in as Moderator"
+          />
           <Button
             type="submit"
             variant="contained"
             color="primary"
             fullWidth
             sx={{ mt: 2, py: 1, fontSize: "1rem", fontWeight: 600 }}
-            onClick={handleSubmit}
           >
             Sign In
           </Button>

@@ -10,7 +10,11 @@ interface AuthProviderProps {
 
 interface AuthContextType {
   user: User | null;
-  signin: (email: string, password: string) => Promise<void>;
+  signin: (
+    email: string,
+    password: string,
+    isModerator: boolean
+  ) => Promise<void>;
   signup: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
@@ -60,15 +64,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     checkUser();
   }, []);
 
-  const signin = async (email: string, password: string) => {
+  const signin = async (
+    email: string,
+    password: string,
+    isModerator: boolean
+  ) => {
     setLoading(true);
     clearError();
     console.log("Signin function called");
     try {
-      const response = await api.public.signin(email, password);
-      setUser(response.user);
-      console.log("User signed in:", response.user);
-      router.push("/profile");
+      if (isModerator) {
+        console.log("Moderator signin called");
+        const response = await api.public.moderatorSigin(email, password);
+        setUser(response.user);
+        console.log("Moderator signed in:", response.user);
+        router.push("/admin/applications");
+      } else {
+        const response = await api.public.signin(email, password);
+        setUser(response.user);
+        console.log("User signed in:", response.user);
+        router.push("/profile");
+      }
     } catch (err: any) {
       console.error("Error during login:", err);
       setError(

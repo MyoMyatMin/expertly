@@ -45,7 +45,6 @@ privateApi.interceptors.response.use(
     const errorMessage = error.response?.data?.error;
 
     if (
-      // originalRequest.url === "/auth/me" ||
       errorMessage !== "token is expired" ||
       originalRequest.url === "/refresh-token"
     ) {
@@ -98,6 +97,17 @@ export const api = {
         name,
       });
       return response.data;
+    },
+    moderatorSigin: async (email: string, password: string) => {
+      const reponse = await publicApi.post(
+        "/admin/login",
+        {
+          email,
+          password,
+        },
+        { withCredentials: true }
+      );
+      return reponse.data;
     },
   },
   protected: {
