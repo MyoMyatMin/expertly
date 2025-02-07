@@ -8,6 +8,7 @@ import { useEffect } from "react";
 const withAuth = (WrappedComponent: React.ComponentType) => {
   const Wrapper = (props: any) => {
     const { user, loading } = useAuth();
+    console.log("User:", user);
     const router = useRouter();
 
     useEffect(() => {

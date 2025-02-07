@@ -2,20 +2,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/helper/axiosInstance";
-
-interface User {
-  ID: string;
-  Name: string;
-  Email: string;
-  Role: {
-    String: string;
-    Valid: boolean;
-  };
-  SuspendedUntil: {
-    Time: string;
-    Valid: boolean;
-  };
-}
+import { User } from "@/types/types";
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -48,41 +35,39 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const clearError = () => setError(null);
 
   const checkUser = async () => {
-    // setLoading(true);
-    // clearError();
+    setLoading(true);
+    clearError();
 
-    // try {
-    //   const response = await api.protected.getMe();
-    //   console.log("User fetched:", response);
-    //   setUser(response.user);
-    // } catch (err: any) {
-    //   console.log("Here is auth context");
-    //   console.error("Error fetching user:", err);
-    //   setUser(null);
+    try {
+      const response = await api.protected.getMe();
+      console.log("User fetched:", response);
+      setUser(response.user);
+    } catch (err: any) {
+      console.log("Here is auth context");
+      console.error("Error fetching user:", err);
+      setUser(null);
 
-    //   // Only redirect to signin if not already on auth pages
-    //   const currentPath = window.location.pathname;
-    //   if (!currentPath.startsWith("/auth/")) {
-    //     router.push("/auth/signin");
-    //   }
-    // } finally {
-    //   setLoading(false);
-    // }
-    loadDummyUser();
+      const currentPath = window.location.pathname;
+      if (!currentPath.startsWith("/auth/")) {
+        router.push("/auth/signin");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    //console.log(images, "This is in create post");
     checkUser();
   }, []);
 
   const signin = async (email: string, password: string) => {
     setLoading(true);
     clearError();
-
+    console.log("Signin function called");
     try {
       const response = await api.public.signin(email, password);
       setUser(response.user);
+      console.log("User signed in:", response.user);
       router.push("/profile");
     } catch (err: any) {
       console.error("Error during login:", err);
@@ -132,23 +117,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  const loadDummyUser = () => {
-    const dummyUser: User = {
-      ID: "d3a23455-a403-49b9-957a-3c6f90f5cf99",
-      Name: "MMM",
-      Email: "mmm@gmail.com",
-      Role: {
-        String: "superadmin",
-        Valid: true,
-      },
-      SuspendedUntil: {
-        Time: "0001-01-01T00:00:00Z",
-        Valid: false,
-      },
-    };
-    setUser(dummyUser);
-  };
-
   const value: AuthContextType = {
     user,
     signin,
@@ -161,7 +129,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Custom hook for using auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

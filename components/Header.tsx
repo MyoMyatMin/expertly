@@ -28,6 +28,7 @@ import Post from "@/components/PostBox";
 
 const Header: React.FC = () => {
   const { user, logout } = useContext(AuthContext);
+  console.log("User from Header:", user);
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -41,12 +42,11 @@ const Header: React.FC = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-
-  const isSuperAdmin = user?.Role.String === "superadmin";
-  const isAdmin =
-    user?.Role.String === "superadmin" || user?.Role.String === "moderator";
-  const isContributor = user?.Role.String === "contributor";
-  console.log("User Role:", user?.Role.String, isContributor);
+  console.log("User:", user);
+  const isSuperAdmin = user?.role === "admin";
+  const isAdmin = user?.role === "admin" || user?.role === "moderator";
+  const isContributor = user?.role === "contributor";
+  console.log("User Role:", user?.role, isContributor);
   const isRegularUser = !isAdmin && !isContributor;
 
   const renderMobileMenuItems = () => {
@@ -147,7 +147,7 @@ const Header: React.FC = () => {
           />
         )}
 
-        {isMobile ? (
+        {/* {isMobile ? (
           <>
             <IconButton onClick={handleMenuOpen}>
               <MenuIcon sx={{ color: "black" }} />
@@ -161,86 +161,85 @@ const Header: React.FC = () => {
               {renderMobileMenuItems()}
             </Menu>
           </>
-        ) : (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            {user ? (
-              <>
-                {/* Show "Create" button only for superadmin */}
-                {isSuperAdmin && (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => router.push("/admin/panel")}
-                    startIcon={<Add />}
-                    sx={{ height: "40px" }}
-                  >
-                    Create
-                  </Button>
-                )}
-                {isAdmin && (
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={() => router.push("/admin/contributors")}
-                    startIcon={<AdminPanelSettings />}
-                    sx={{ height: "40px" }}
-                  >
-                    Admin
-                  </Button>
-                )}
-                {isRegularUser && (
-                  <Button
-                    variant="contained"
-                    color="info"
-                    onClick={() => router.push("/applicationform")}
-                    startIcon={<Add />}
-                    sx={{ height: "40px" }}
-                  >
-                    To Contributor
-                  </Button>
-                )}
-                {isContributor && (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => router.push("/posts/create")}
-                    startIcon={<Add />}
-                    sx={{ height: "40px" }}
-                  >
-                    Create Post
-                  </Button>
-                )}
-                <AccountCircle
-                  sx={{
-                    color: "black",
-                    cursor: "pointer",
-                    fontSize: "36px",
-                  }}
-                  onClick={() => router.push("/profile")}
-                />
+        ) : ( */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          {user ? (
+            <>
+              {isSuperAdmin && (
                 <Button
-                  variant="outlined"
-                  onClick={logout}
-                  startIcon={<Whatshot />}
+                  variant="contained"
+                  color="primary"
+                  onClick={() => router.push("/admin/panel")}
+                  startIcon={<Add />}
                   sx={{ height: "40px" }}
                 >
-                  Logout
+                  Create
                 </Button>
-              </>
-            ) : (
-              <>
+              )}
+              {isAdmin && (
                 <Button
-                  variant="outlined"
-                  onClick={() => router.push("/auth/signin")}
-                  startIcon={<AccountCircle />}
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => router.push("/admin/contributors")}
+                  startIcon={<AdminPanelSettings />}
                   sx={{ height: "40px" }}
                 >
-                  Signin
+                  Admin
                 </Button>
-              </>
-            )}
-          </Box>
-        )}
+              )}
+              {isRegularUser && (
+                <Button
+                  variant="contained"
+                  color="info"
+                  onClick={() => router.push("/applicationform")}
+                  startIcon={<Add />}
+                  sx={{ height: "40px" }}
+                >
+                  To Contributor
+                </Button>
+              )}
+              {isContributor && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => router.push("/posts/create")}
+                  startIcon={<Add />}
+                  sx={{ height: "40px" }}
+                >
+                  Create Post
+                </Button>
+              )}
+              <AccountCircle
+                sx={{
+                  color: "black",
+                  cursor: "pointer",
+                  fontSize: "36px",
+                }}
+                onClick={() => router.push("/profile")}
+              />
+              <Button
+                variant="outlined"
+                onClick={logout}
+                startIcon={<Whatshot />}
+                sx={{ height: "40px" }}
+              >
+                Logout
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="outlined"
+                onClick={() => router.push("/auth/signin")}
+                startIcon={<AccountCircle />}
+                sx={{ height: "40px" }}
+              >
+                Signin
+              </Button>
+            </>
+          )}
+        </Box>
+        {/* )} */}
       </Toolbar>
     </AppBar>
   );

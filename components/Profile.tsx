@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 
 type Props = {
-  isOwnProfile: boolean; // Prop to determine if it's the logged-in user's profile
+  isOwnProfile: boolean;
   name: string;
   bio: string;
   profilePic: string;

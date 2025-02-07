@@ -6,7 +6,7 @@ import AuthContext from "@/contexts/AuthProvider";
 
 const Signup: React.FC = () => {
   const router = useRouter();
-  const { signup } = useContext(AuthContext); // Access signup function from AuthContext
+  const { signup } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -26,7 +26,6 @@ const Signup: React.FC = () => {
       return;
     }
 
-    // Call signup function from AuthContext
     await signup(formData.email, formData.password, formData.name);
     console.log("Signup form submitted:", formData);
     router.push("/profile");

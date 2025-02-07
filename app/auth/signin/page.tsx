@@ -19,6 +19,7 @@ const SignIn: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Signin form submitted:", formData);
     try {
       console.log("Signin form submitted:", formData);
       await signin(formData.email, formData.password);
@@ -78,6 +79,7 @@ const SignIn: React.FC = () => {
             color="primary"
             fullWidth
             sx={{ mt: 2, py: 1, fontSize: "1rem", fontWeight: 600 }}
+            onClick={handleSubmit}
           >
             Sign In
           </Button>
