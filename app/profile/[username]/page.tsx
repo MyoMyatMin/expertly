@@ -22,7 +22,7 @@ const OtherUserProfilePage = () => {
   const [userData, setUserData] = useState<User | null>(null);
   const [tabValue, setTabValue] = useState(0);
   const [followings, setFollowings] = useState([]);
-
+  const [savedPosts, setSavedPosts] = useState([]);
   const fetchUserData = async () => {
     try {
       const response = await api.protected.getProfileData(username as string);
@@ -43,6 +43,16 @@ const OtherUserProfilePage = () => {
     }
   };
 
+  const getSavedPosts = async () => {
+    try {
+      const response = await api.protected.getSavedPosts(username as string);
+      console.log("Saved Posts", response);
+      setSavedPosts(response);
+    } catch (error) {
+      console.error("Failed to fetch saved posts:", error);
+    }
+  };
+
   useEffect(() => {
     fetchUserData();
   }, [username]);
@@ -50,6 +60,9 @@ const OtherUserProfilePage = () => {
   useEffect(() => {
     if (tabValue === 0) {
       getFollowings();
+    }
+    if (tabValue === 1) {
+      getSavedPosts();
     }
   }, [tabValue]);
 
@@ -103,7 +116,7 @@ const OtherUserProfilePage = () => {
         </Tabs>
         <Box sx={{ p: 2 }}>
           {tabValue === 0 && <FollowingTab followings={followings} />}
-          {tabValue === 1 && <SavedPostsTab data={undefined} />}
+          {tabValue === 1 && <SavedPostsTab data={savedPosts} />}
           {userData?.role === "contributor" && tabValue === 2 && (
             <PostsTab data={undefined} />
           )}
