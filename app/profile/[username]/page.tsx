@@ -1,6 +1,6 @@
 "use client";
 import { useParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -16,13 +16,26 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import FollowingTab from "@/components/FollowingTab";
 import SavedPostsTab from "@/components/SavedPosts";
 import PostsTab from "@/components/PostsTab";
+import AuthContext from "@/contexts/AuthProvider";
 
 const OtherUserProfilePage = () => {
+  const { user: currentUser } = useContext(AuthContext);
+  console.log("Current User", currentUser?.username);
   const { username } = useParams();
   const [userData, setUserData] = useState<User | null>(null);
   const [tabValue, setTabValue] = useState(0);
   const [followings, setFollowings] = useState([]);
   const [savedPosts, setSavedPosts] = useState([]);
+  const [contributorPosts, setContributorPosts] = useState([]);
+  const [showEditButton, setShowEditButton] = useState(false);
+
+  useEffect(() => {
+    if (currentUser?.username === username) {
+      setShowEditButton(true);
+    } else {
+      setShowEditButton(false);
+    }
+  }, [currentUser, username]);
   const fetchUserData = async () => {
     try {
       const response = await api.protected.getProfileData(username as string);
@@ -35,7 +48,6 @@ const OtherUserProfilePage = () => {
   const getFollowings = async () => {
     try {
       const response = await api.protected.getFollowings(username as string);
-
       setFollowings(response);
       console.log("Followings", response);
     } catch (error) {
@@ -53,8 +65,21 @@ const OtherUserProfilePage = () => {
     }
   };
 
+  const getContributorPosts = async () => {
+    try {
+      const response = await api.protected.getPostsForContributor(
+        username as string
+      );
+      console.log("Contributor Posts", response);
+      setContributorPosts(response);
+    } catch (error) {
+      console.error("Failed to fetch contributor posts:", error);
+    }
+  };
+
   useEffect(() => {
     fetchUserData();
+    console.log("Current User", currentUser?.username, username);
   }, [username]);
 
   useEffect(() => {
@@ -63,6 +88,9 @@ const OtherUserProfilePage = () => {
     }
     if (tabValue === 1) {
       getSavedPosts();
+    }
+    if (tabValue === 2 && userData?.role === "contributor") {
+      getContributorPosts();
     }
   }, [tabValue]);
 
@@ -75,6 +103,10 @@ const OtherUserProfilePage = () => {
 
   const handleFollow = () => {
     alert("Followed!");
+  };
+
+  const handleEditProfile = () => {
+    alert("Edit Profile!");
   };
 
   return (
@@ -103,9 +135,15 @@ const OtherUserProfilePage = () => {
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           Followers: {userData?.followers} | Following: {userData?.following}
         </Typography>
-        <Button variant="contained" onClick={handleFollow}>
-          Follow
-        </Button>
+        {showEditButton ? (
+          <Button variant="contained" onClick={handleEditProfile}>
+            Edit Profile
+          </Button>
+        ) : (
+          <Button variant="contained" onClick={handleFollow}>
+            Follow
+          </Button>
+        )}
       </Paper>
 
       <Paper elevation={0} sx={{ mt: 4 }}>
@@ -118,7 +156,7 @@ const OtherUserProfilePage = () => {
           {tabValue === 0 && <FollowingTab followings={followings} />}
           {tabValue === 1 && <SavedPostsTab data={savedPosts} />}
           {userData?.role === "contributor" && tabValue === 2 && (
-            <PostsTab data={undefined} />
+            <PostsTab data={contributorPosts} />
           )}
         </Box>
       </Paper>

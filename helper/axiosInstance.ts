@@ -158,6 +158,10 @@ export const api = {
       console.log("Saved Posts", response.data);
       return response.data;
     },
+    getPostsForContributor: async (username: string) => {
+      const response = await privateApi.get(`/profile/${username}/posts`);
+      return response.data;
+    },
   },
 };
 
