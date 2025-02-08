@@ -16,7 +16,7 @@ type Props = {
   name: string;
   bio: string;
   profilePic: string;
-  posts: string[]; // Assume posts is an array of post content for the user
+  posts: string[];
 };
 
 const Profile: React.FC<Props> = ({
@@ -41,9 +41,7 @@ const Profile: React.FC<Props> = ({
 
   const handleSave = () => {
     if (newProfilePic) {
-      // Update the profile pic
       const objectUrl = URL.createObjectURL(newProfilePic);
-      // Set the updated profile pic if a new one is uploaded
     }
     setIsEditing(false);
   };

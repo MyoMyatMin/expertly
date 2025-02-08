@@ -142,6 +142,17 @@ export const api = {
       const response = await privateApi.put(`/posts/${data.id}`, data);
       return response.data;
     },
+
+    getProfileData: async (username: string) => {
+      const response = await privateApi.get(`/profile/${username}`);
+      return response.data;
+    },
+
+    getFollowings: async (username: string) => {
+      const response = await privateApi.get(`/users/${username}/following`);
+      console.log("Following list", response.data);
+      return response.data;
+    },
   },
 };
 

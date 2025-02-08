@@ -6,4 +6,6 @@ export interface User {
   email: string;
   role: "admin" | "user" | "contributor" | "moderator"; // Adjust roles if needed
   suspended_until: string; // Consider using Date instead of string if parsing
+  followers?: number;
+  following?: number;
 }
