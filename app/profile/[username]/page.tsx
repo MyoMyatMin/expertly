@@ -10,6 +10,7 @@ import {
   Tab,
   Paper,
   CircularProgress,
+  TextField,
 } from "@mui/material";
 import { api } from "@/helper/axiosInstance";
 import { User, Post, Following } from "@/types/types";
@@ -30,6 +31,11 @@ const OtherUserProfilePage = () => {
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    username: "",
+    name: "",
+  });
 
   useEffect(() => {
     setIsOwnProfile(currentUser?.username === username);
@@ -40,7 +46,11 @@ const OtherUserProfilePage = () => {
       setIsLoading(true);
       const response = await api.protected.getProfileData(username as string);
       setUserData(response.user);
-      setIsFollowing(response.isFollowing);
+      setIsFollowing(response.user.is_following);
+      setEditForm({
+        username: response.user.username,
+        name: response.user.name,
+      });
     } catch (error) {
       console.error("Failed to fetch user data:", error);
     } finally {
@@ -96,23 +106,39 @@ const OtherUserProfilePage = () => {
   const handleFollow = async () => {
     try {
       if (isFollowing) {
-        await api.protected.unfollowUser(username as string);
+        await api.protected.unfollowUser(userData?.user_id as string);
       } else {
-        await api.protected.followUser(username as string);
+        await api.protected.followUser(userData?.user_id as string);
       }
       setIsFollowing(!isFollowing);
-      fetchUserData(); // Refresh user data to update follower count
+      fetchUserData();
     } catch (error) {
       console.error("Failed to follow/unfollow user:", error);
     }
   };
 
   const handleEditProfile = () => {
-    window.location.href = `/profile/edit`;
+    setIsEditing(true);
   };
 
   const handleTabChange = (_event: any, newValue: number) => {
     setTabValue(newValue);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setEditForm((prevForm) => ({ ...prevForm, [name]: value }));
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await api.protected.updateUser(editForm.name, editForm.username);
+      setIsEditing(false);
+      fetchUserData();
+    } catch (error) {
+      console.error("Failed to update user:", error);
+    }
   };
 
   if (isLoading) {
@@ -139,35 +165,61 @@ const OtherUserProfilePage = () => {
           alt="Profile Pic"
           sx={{ width: 120, height: 120, mx: "auto", mb: 2 }}
         />
-        <Typography
-          variant="h5"
-          sx={{
-            fontWeight: 700,
-            mb: 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {userData.name}
-          {userData.role === "contributor" && (
-            <CheckCircleIcon sx={{ color: "blue", ml: 1 }} />
-          )}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Followers: {userData.followers} | Following: {userData.following}
-        </Typography>
-        {isOwnProfile ? (
-          <Button variant="contained" onClick={handleEditProfile}>
-            Edit Profile
-          </Button>
+        {isEditing ? (
+          <form onSubmit={handleFormSubmit}>
+            <TextField
+              label="Username"
+              name="username"
+              value={editForm.username}
+              onChange={handleInputChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Name"
+              name="name"
+              value={editForm.name}
+              onChange={handleInputChange}
+              fullWidth
+              margin="normal"
+            />
+            <Button type="submit" variant="contained" sx={{ mt: 2 }}>
+              Save Changes
+            </Button>
+          </form>
         ) : (
-          <Button
-            variant={isFollowing ? "outlined" : "contained"}
-            onClick={handleFollow}
-          >
-            {isFollowing ? "Unfollow" : "Follow"}
-          </Button>
+          <>
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 700,
+                mb: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {userData.name}
+              {userData.role === "contributor" && (
+                <CheckCircleIcon sx={{ color: "blue", ml: 1 }} />
+              )}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Followers: {userData.followers} | Following: {userData.following}
+            </Typography>
+            {isOwnProfile ? (
+              <Button variant="contained" onClick={handleEditProfile}>
+                Edit Profile
+              </Button>
+            ) : (
+              <Button
+                variant={isFollowing ? "outlined" : "contained"}
+                onClick={handleFollow}
+              >
+                {isFollowing ? "Unfollow" : "Follow"}
+              </Button>
+            )}
+          </>
         )}
       </Paper>
 

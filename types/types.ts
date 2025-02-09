@@ -8,6 +8,7 @@ export interface User {
   suspended_until: string; // Consider using Date instead of string if parsing
   followers?: number;
   following?: number;
+  is_follwing?: boolean;
 }
 
 export interface Post {

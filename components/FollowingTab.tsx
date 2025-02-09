@@ -1,4 +1,5 @@
 import { Box, Typography, Avatar, Button } from "@mui/material";
+import { useRouter } from "next/navigation";
 import { api } from "@/helper/axiosInstance";
 import { Following } from "@/types/types";
 
@@ -13,15 +14,21 @@ const FollowingTab = ({
   isOwnProfile,
   onUnfollow,
 }: FollowingTabProps) => {
-  const handleUnfollow = async (username: string) => {
+  const router = useRouter();
+
+  const handleUnfollow = async (userid: string) => {
     if (window.confirm("Are you sure you want to unfollow this user?")) {
       try {
-        await api.protected.unfollowUser(username);
+        await api.protected.unfollowUser(userid);
         onUnfollow();
       } catch (error) {
         console.error("Failed to unfollow user:", error);
       }
     }
+  };
+
+  const handleProfileClick = (username: string) => {
+    router.push(`/profile/${username}`);
   };
 
   if (!followings?.length) {
@@ -36,7 +43,6 @@ const FollowingTab = ({
     <Box>
       {followings.map((following: Following) => (
         <Box
-          // Use username as key since it's unique and always present
           key={following.Name}
           sx={{
             display: "flex",
@@ -51,7 +57,10 @@ const FollowingTab = ({
             },
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Box
+            sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+            onClick={() => handleProfileClick(following.Username)}
+          >
             <Avatar
               src="https://source.unsplash.com/random"
               alt={following.Name}

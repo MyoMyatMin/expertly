@@ -163,13 +163,24 @@ export const api = {
       return response.data;
     },
 
-    followUser: async (username: string) => {
-      const response = await privateApi.post(`/users/${username}/follow`);
+    followUser: async (userid: string) => {
+      const response = await privateApi.post(`/follow`, {
+        following_id: userid,
+      });
       return response.data;
     },
 
     unfollowUser: async (userid: string) => {
+      console.log("Unfollowing user", userid);
       const response = await privateApi.delete(`/follow/${userid}`);
+      return response.data;
+    },
+
+    updateUser: async (name, username) => {
+      const response = await privateApi.put(`/profile/update`, {
+        name: name,
+        username: username,
+      });
       return response.data;
     },
 
