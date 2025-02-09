@@ -176,7 +176,7 @@ export const api = {
       return response.data;
     },
 
-    updateUser: async (name, username) => {
+    updateUser: async (name: string, username: string) => {
       const response = await privateApi.put(`/profile/update`, {
         name: name,
         username: username,

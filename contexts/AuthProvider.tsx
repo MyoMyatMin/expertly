@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         const response = await api.public.signin(email, password);
         setUser(response.user);
         console.log("User signed in:", response.user);
-        router.push("/profile");
+        router.push(`/profile/${response.user.username}`);
       }
     } catch (err: any) {
       console.error("Error during login:", err);

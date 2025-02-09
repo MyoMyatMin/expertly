@@ -102,6 +102,7 @@ const OtherUserProfilePage = () => {
   }, [username]);
 
   useEffect(() => {
+    // Load tab data based on tabValue and user role
     if (tabValue === 0) {
       getFollowings();
     }
@@ -166,16 +167,9 @@ const OtherUserProfilePage = () => {
     setError(null);
   };
 
-  const isUserSuspended = () => {
-    if (!userData?.suspended_until) return false;
-    const suspendedUntil = new Date(userData.suspended_until); // Dummy future date
-    console.log("Suspended until:", suspendedUntil > new Date());
-    return suspendedUntil > new Date();
-  };
-
   const getSuspensionDaysLeft = () => {
     if (!userData?.suspended_until) return null;
-    const suspendedUntil = new Date(userData.suspended_until);
+    const suspendedUntil = new Date("2099-12-31T23:59:59.999Z");
     const currentDate = new Date();
     const timeDiff = suspendedUntil.getTime() - currentDate.getTime();
     const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
@@ -201,8 +195,7 @@ const OtherUserProfilePage = () => {
   }
 
   const tabLabels: string[] = [];
-  if (isUserSuspended() && isOwnProfile) {
-    console.log("User is suspended");
+  if (suspensionDaysLeft && isOwnProfile) {
     tabLabels.push("Appeals");
   } else {
     tabLabels.push("Following", "Saved Posts");
@@ -300,19 +293,17 @@ const OtherUserProfilePage = () => {
                 Suspended for {suspensionDaysLeft} more day(s)
               </Typography>
             )}
-            {isOwnProfile && !isUserSuspended() ? (
+            {isOwnProfile ? (
               <Button variant="contained" onClick={handleEditProfile}>
                 Edit Profile
               </Button>
             ) : (
-              !isOwnProfile && (
-                <Button
-                  variant={isFollowing ? "outlined" : "contained"}
-                  onClick={handleFollow}
-                >
-                  {isFollowing ? "Unfollow" : "Follow"}
-                </Button>
-              )
+              <Button
+                variant={isFollowing ? "outlined" : "contained"}
+                onClick={handleFollow}
+              >
+                {isFollowing ? "Unfollow" : "Follow"}
+              </Button>
             )}
           </>
         )}
