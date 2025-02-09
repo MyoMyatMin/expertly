@@ -1,39 +1,88 @@
-import { Box, Typography, Link, Avatar } from "@mui/material";
+import { Box, Typography, Avatar, Button } from "@mui/material";
+import { api } from "@/helper/axiosInstance";
+import { Following } from "@/types/types";
 
-const FollowingTab = ({ followings }: { followings: any }) => {
-  console.log(followings);
+interface FollowingTabProps {
+  followings: Following[];
+  isOwnProfile: boolean;
+  onUnfollow: () => void;
+}
 
-  if (followings.length === 0) {
+const FollowingTab = ({
+  followings,
+  isOwnProfile,
+  onUnfollow,
+}: FollowingTabProps) => {
+  const handleUnfollow = async (username: string) => {
+    if (window.confirm("Are you sure you want to unfollow this user?")) {
+      try {
+        await api.protected.unfollowUser(username);
+        onUnfollow();
+      } catch (error) {
+        console.error("Failed to unfollow user:", error);
+      }
+    }
+  };
+
+  if (!followings?.length) {
     return (
-      <Box>
-        <Typography variant="body1">
-          User hasn't followed anyone yet.
-        </Typography>
-      </Box>
+      <Typography sx={{ textAlign: "center", mt: 2 }}>
+        Not following anyone yet
+      </Typography>
     );
   }
 
-  const getRandomProfilePic = () => {
-    const pics = [
-      "https://randomuser.me/api/portraits/men/1.jpg",
-      "https://randomuser.me/api/portraits/women/1.jpg",
-      "https://randomuser.me/api/portraits/men/2.jpg",
-      "https://randomuser.me/api/portraits/women/2.jpg",
-      // Add more URLs as needed
-    ];
-    return pics[Math.floor(Math.random() * pics.length)];
-  };
-
   return (
     <Box>
-      {followings.map((following: any) => (
-        <Box key={following.Username} display="flex" alignItems="center" mb={2}>
-          <Avatar src={getRandomProfilePic()} alt={following.Name} />
-          <Typography variant="body1" ml={2}>
-            <Link href={`/profile/${following.Username}`} underline="hover">
-              {following.Name}
-            </Link>
-          </Typography>
+      {followings.map((following: Following) => (
+        <Box
+          // Use username as key since it's unique and always present
+          key={following.Name}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            mb: 2,
+            p: 2,
+            border: "1px solid #eee",
+            borderRadius: 1,
+            "&:hover": {
+              backgroundColor: "rgba(0, 0, 0, 0.02)",
+            },
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Avatar
+              src="https://source.unsplash.com/random"
+              alt={following.Name}
+              sx={{ width: 50, height: 50 }}
+            />
+            <Box sx={{ ml: 2 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+                {following.Name}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                @{following.Username}
+              </Typography>
+            </Box>
+          </Box>
+          {isOwnProfile && (
+            <Button
+              variant="outlined"
+              color="primary"
+              size="small"
+              onClick={() => handleUnfollow(following.FollowingID)}
+              sx={{
+                "&:hover": {
+                  backgroundColor: "error.light",
+                  borderColor: "error.main",
+                  color: "error.main",
+                },
+              }}
+            >
+              Unfollow
+            </Button>
+          )}
         </Box>
       ))}
     </Box>

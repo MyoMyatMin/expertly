@@ -9,3 +9,22 @@ export interface User {
   followers?: number;
   following?: number;
 }
+
+export interface Post {
+  PostID: string;
+  Slug: string;
+  Title: string;
+  UserID: string;
+  Content: string;
+  CreatedAt: Date;
+  UpdatedAt?: Date;
+  UpvoteCount?: number;
+  CommentCount?: number;
+  Upvotes?: number;
+}
+
+export interface Following {
+  FollowingID: string;
+  Name: string;
+  Username: string;
+}

@@ -9,9 +9,10 @@ import {
   Tabs,
   Tab,
   Paper,
+  CircularProgress,
 } from "@mui/material";
 import { api } from "@/helper/axiosInstance";
-import { User } from "../../../types/types";
+import { User, Post, Following } from "@/types/types";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import FollowingTab from "@/components/FollowingTab";
 import SavedPostsTab from "@/components/SavedPosts";
@@ -20,28 +21,30 @@ import AuthContext from "@/contexts/AuthProvider";
 
 const OtherUserProfilePage = () => {
   const { user: currentUser } = useContext(AuthContext);
-  console.log("Current User", currentUser?.username);
   const { username } = useParams();
   const [userData, setUserData] = useState<User | null>(null);
   const [tabValue, setTabValue] = useState(0);
-  const [followings, setFollowings] = useState([]);
-  const [savedPosts, setSavedPosts] = useState([]);
-  const [contributorPosts, setContributorPosts] = useState([]);
-  const [showEditButton, setShowEditButton] = useState(false);
+  const [followings, setFollowings] = useState<Following[]>([]);
+  const [savedPosts, setSavedPosts] = useState<Post[]>([]);
+  const [contributorPosts, setContributorPosts] = useState<Post[]>([]);
+  const [isOwnProfile, setIsOwnProfile] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   useEffect(() => {
-    if (currentUser?.username === username) {
-      setShowEditButton(true);
-    } else {
-      setShowEditButton(false);
-    }
+    setIsOwnProfile(currentUser?.username === username);
   }, [currentUser, username]);
+
   const fetchUserData = async () => {
     try {
+      setIsLoading(true);
       const response = await api.protected.getProfileData(username as string);
       setUserData(response.user);
+      setIsFollowing(response.isFollowing);
     } catch (error) {
       console.error("Failed to fetch user data:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -49,7 +52,6 @@ const OtherUserProfilePage = () => {
     try {
       const response = await api.protected.getFollowings(username as string);
       setFollowings(response);
-      console.log("Followings", response);
     } catch (error) {
       console.error("Failed to fetch followings:", error);
     }
@@ -58,7 +60,6 @@ const OtherUserProfilePage = () => {
   const getSavedPosts = async () => {
     try {
       const response = await api.protected.getSavedPosts(username as string);
-      console.log("Saved Posts", response);
       setSavedPosts(response);
     } catch (error) {
       console.error("Failed to fetch saved posts:", error);
@@ -70,7 +71,6 @@ const OtherUserProfilePage = () => {
       const response = await api.protected.getPostsForContributor(
         username as string
       );
-      console.log("Contributor Posts", response);
       setContributorPosts(response);
     } catch (error) {
       console.error("Failed to fetch contributor posts:", error);
@@ -79,7 +79,6 @@ const OtherUserProfilePage = () => {
 
   useEffect(() => {
     fetchUserData();
-    console.log("Current User", currentUser?.username, username);
   }, [username]);
 
   useEffect(() => {
@@ -92,28 +91,51 @@ const OtherUserProfilePage = () => {
     if (tabValue === 2 && userData?.role === "contributor") {
       getContributorPosts();
     }
-  }, [tabValue]);
+  }, [tabValue, userData?.role]);
 
-  const handleTabChange = (
-    _event: any,
-    newValue: React.SetStateAction<number>
-  ) => {
-    setTabValue(newValue);
-  };
-
-  const handleFollow = () => {
-    alert("Followed!");
+  const handleFollow = async () => {
+    try {
+      if (isFollowing) {
+        await api.protected.unfollowUser(username as string);
+      } else {
+        await api.protected.followUser(username as string);
+      }
+      setIsFollowing(!isFollowing);
+      fetchUserData(); // Refresh user data to update follower count
+    } catch (error) {
+      console.error("Failed to follow/unfollow user:", error);
+    }
   };
 
   const handleEditProfile = () => {
-    alert("Edit Profile!");
+    window.location.href = `/profile/edit`;
   };
+
+  const handleTabChange = (_event: any, newValue: number) => {
+    setTabValue(newValue);
+  };
+
+  if (isLoading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <Box sx={{ textAlign: "center", mt: 4 }}>
+        <Typography>User not found</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ maxWidth: 1000, mx: "auto", mt: 4, px: 2 }}>
       <Paper elevation={0} sx={{ p: 4, textAlign: "center" }}>
         <Avatar
-          src="https://randomuser.me/api/portraits/men/75.jpg"
+          src={"https://randomuser.me/api/portraits/men/75.jpg"}
           alt="Profile Pic"
           sx={{ width: 120, height: 120, mx: "auto", mb: 2 }}
         />
@@ -127,21 +149,24 @@ const OtherUserProfilePage = () => {
             justifyContent: "center",
           }}
         >
-          {userData?.name}
-          {userData?.role === "contributor" && (
+          {userData.name}
+          {userData.role === "contributor" && (
             <CheckCircleIcon sx={{ color: "blue", ml: 1 }} />
           )}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Followers: {userData?.followers} | Following: {userData?.following}
+          Followers: {userData.followers} | Following: {userData.following}
         </Typography>
-        {showEditButton ? (
+        {isOwnProfile ? (
           <Button variant="contained" onClick={handleEditProfile}>
             Edit Profile
           </Button>
         ) : (
-          <Button variant="contained" onClick={handleFollow}>
-            Follow
+          <Button
+            variant={isFollowing ? "outlined" : "contained"}
+            onClick={handleFollow}
+          >
+            {isFollowing ? "Unfollow" : "Follow"}
           </Button>
         )}
       </Paper>
@@ -150,12 +175,24 @@ const OtherUserProfilePage = () => {
         <Tabs value={tabValue} onChange={handleTabChange} centered>
           <Tab label="Following" />
           <Tab label="Saved Posts" />
-          {userData?.role === "contributor" && <Tab label="Posts" />}
+          {userData.role === "contributor" && <Tab label="Posts" />}
         </Tabs>
         <Box sx={{ p: 2 }}>
-          {tabValue === 0 && <FollowingTab followings={followings} />}
-          {tabValue === 1 && <SavedPostsTab data={savedPosts} />}
-          {userData?.role === "contributor" && tabValue === 2 && (
+          {tabValue === 0 && (
+            <FollowingTab
+              followings={followings}
+              isOwnProfile={isOwnProfile}
+              onUnfollow={getFollowings}
+            />
+          )}
+          {tabValue === 1 && (
+            <SavedPostsTab
+              data={savedPosts}
+              isOwnProfile={isOwnProfile}
+              onUnsave={getSavedPosts}
+            />
+          )}
+          {userData.role === "contributor" && tabValue === 2 && (
             <PostsTab data={contributorPosts} />
           )}
         </Box>

@@ -162,6 +162,20 @@ export const api = {
       const response = await privateApi.get(`/profile/${username}/posts`);
       return response.data;
     },
+
+    followUser: async (username: string) => {
+      const response = await privateApi.post(`/users/${username}/follow`);
+      return response.data;
+    },
+
+    unfollowUser: async (userid: string) => {
+      const response = await privateApi.delete(`/follow/${userid}`);
+      return response.data;
+    },
+
+    unsavedPost: async (postId: string) => {
+      const response = await privateApi.delete(`/saved_posts/${postId}`);
+    },
   },
 };
 
