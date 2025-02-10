@@ -102,8 +102,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     try {
       const response = await api.public.signup(email, password, name);
+      console.log("User signed up sucessfull:", response.user);
       setUser(response.user);
-      router.push("/profile");
+      console.log("User signed up :", user);
+      router.push(`/profile/${response.user.username}`);
     } catch (err: any) {
       console.error("Error during signup:", err);
       setError(

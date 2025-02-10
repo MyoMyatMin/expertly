@@ -27,8 +27,8 @@ const Signup: React.FC = () => {
     }
 
     await signup(formData.email, formData.password, formData.name);
-    console.log("Signup form submitted:", formData);
-    router.push("/profile");
+
+    //router.push("/profile");
   };
 
   return (
@@ -97,6 +97,7 @@ const Signup: React.FC = () => {
             variant="contained"
             color="primary"
             fullWidth
+            onAbort={handleSubmit}
             sx={{ mt: 2, py: 1, fontSize: "1rem", fontWeight: 600 }}
           >
             Sign Up

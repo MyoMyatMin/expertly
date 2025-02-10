@@ -91,11 +91,15 @@ export const api = {
       return response.data;
     },
     signup: async (email: string, password: string, name: string) => {
-      const response = await publicApi.post("/signup", {
-        email,
-        password,
-        name,
-      });
+      const response = await publicApi.post(
+        "/signup",
+        {
+          email,
+          password,
+          name,
+        },
+        { withCredentials: true }
+      );
       return response.data;
     },
     moderatorSigin: async (email: string, password: string) => {

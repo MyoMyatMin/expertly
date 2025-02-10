@@ -169,6 +169,7 @@ const OtherUserProfilePage = () => {
   const isUserSuspended = () => {
     if (!userData?.suspended_until) return false;
     const suspendedUntil = new Date(userData.suspended_until); // Dummy future date
+    //const suspendedUntil = new Date("2025-04-30");
     console.log("Suspended until:", suspendedUntil > new Date());
     return suspendedUntil > new Date();
   };
@@ -176,6 +177,7 @@ const OtherUserProfilePage = () => {
   const getSuspensionDaysLeft = () => {
     if (!userData?.suspended_until) return null;
     const suspendedUntil = new Date(userData.suspended_until);
+    //const suspendedUntil = new Date("2025-04-30");
     const currentDate = new Date();
     const timeDiff = suspendedUntil.getTime() - currentDate.getTime();
     const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
