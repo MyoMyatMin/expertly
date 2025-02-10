@@ -23,7 +23,6 @@ const CreatePost = (props: Props) => {
 
       console.log("Post saved successfully:", response.data);
       alert("Post saved successfully!");
-      //router.push("/profile");
     } catch (error) {
       console.error("Error saving post:", error);
       alert("An error occurred while saving the post. Please try again.");

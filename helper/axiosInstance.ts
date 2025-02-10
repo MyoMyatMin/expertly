@@ -144,6 +144,7 @@ export const api = {
       images: string[];
     }) => {
       const response = await privateApi.put(`/posts/${data.id}`, data);
+      console.log("Post updated", response.data);
       return response.data;
     },
 
@@ -190,6 +191,16 @@ export const api = {
 
     unsavedPost: async (postId: string) => {
       const response = await privateApi.delete(`/saved_posts/${postId}`);
+      return response.data;
+    },
+    getPostDetailsbySlug: async (slug: string) => {
+      const response = await privateApi.get(`/posts/${slug}`);
+      console.log("Post details", response.data);
+      return response.data;
+    },
+    getPostCommentsBySlug: async (slug: string) => {
+      const response = await privateApi.get(`/posts/${slug}/comments`);
+      return response.data;
     },
   },
 };
