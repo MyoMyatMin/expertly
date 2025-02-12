@@ -1,5 +1,5 @@
 "use client";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   Box,
@@ -13,40 +13,39 @@ import {
 import { api } from "@/helper/axiosInstance";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
-type ContributorApplication = {
-  ContriAppID: string;
-  UserID: string;
-  ExpertiseProofs: string[];
-  IdentityProof: string;
-  InitialSubmission: string;
-  Status: { String: string; Valid: boolean };
-  CreatedAt: { Time: string; Valid: boolean };
-  ReviewedAt: { Time: string; Valid: boolean };
-  Name: string;
-  Username: string;
-};
+import { ContributorApplication } from "@/types/types";
 
 const ContributorDetail = () => {
   const { id } = useParams();
+  const router = useRouter();
   const [contributor, setContributor] = useState<ContributorApplication | null>(
     null
   );
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchContributor = async () => {
-      try {
-        const res = await api.protected.getContributorApplication(id as string);
-        setContributor(res);
-      } catch (err) {
-        console.error("Error fetching contributor application:", err);
-        setError("Failed to load contributor details.");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchContributor = async () => {
+    try {
+      const res = await api.protected.getContributorApplication(id as string);
+      setContributor(res);
+    } catch (err) {
+      console.error("Error fetching contributor application:", err);
+      setError("Failed to load contributor details.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const updateStatus = async (status: string) => {
+    try {
+      await api.protected.updateApplicationStatus(id as string, status);
+      router.push("/admin/applications");
+    } catch (error) {
+      console.error("Failed to update contributor application status:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchContributor();
   }, [id]);
 
@@ -165,22 +164,56 @@ const ContributorDetail = () => {
               </Card>
             ))}
           </Box>
+
+          {contributor.ReviewerName?.String && (
+            <Box sx={{ borderBottom: "2px solid #ccc", pb: 2, mb: 2 }}>
+              <Typography>
+                <strong>Reviewer:</strong> {contributor.ReviewerName.String}
+              </Typography>
+            </Box>
+          )}
         </Box>
       </Box>
 
-      <Box sx={{ mt: 4, textAlign: "center" }}>
-        <Button
-          variant="contained"
-          color="secondary"
-          size="large"
-          sx={{ mr: 3 }}
-        >
-          Approve
-        </Button>
-        <Button variant="outlined" color="secondary" size="large">
-          Reject
-        </Button>
-      </Box>
+      {contributor.Status.String === "approved" && (
+        <Box sx={{ mt: 4, textAlign: "center" }}>
+          <Typography variant="h5" color="success.main">
+            This application has been approved.
+          </Typography>
+        </Box>
+      )}
+
+      {contributor.Status.String === "rejected" && (
+        <Box sx={{ mt: 4, textAlign: "center" }}>
+          <Typography variant="h5" color="error.main">
+            This application has been rejected.
+          </Typography>
+        </Box>
+      )}
+
+      {/* Render buttons only if the status is neither approved nor rejected */}
+      {contributor.Status.String !== "approved" &&
+        contributor.Status.String !== "rejected" && (
+          <Box sx={{ mt: 4, textAlign: "center" }}>
+            <Button
+              variant="contained"
+              color="secondary"
+              size="large"
+              sx={{ mr: 3 }}
+              onClick={() => updateStatus("approved")}
+            >
+              Approve
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              size="large"
+              onClick={() => updateStatus("rejected")}
+            >
+              Reject
+            </Button>
+          </Box>
+        )}
     </>
   );
 };

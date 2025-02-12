@@ -213,6 +213,17 @@ export const api = {
       );
       return response.data;
     },
+    updateApplicationStatus: async (id: string, app_status: string) => {
+      console.log(app_status);
+      const response = await privateApi.put(
+        `/admin/contributor_applications/${id}/status`,
+        {
+          app_status,
+        }
+      );
+      console.log("Application status updated", response.data);
+      return response.data;
+    },
   },
 };
 

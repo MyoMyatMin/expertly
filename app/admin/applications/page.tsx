@@ -35,10 +35,14 @@ const Applications: React.FC = () => {
       // Transform data to match the expected structure
       const formattedData = res.map((app: any) => ({
         ...app,
+
         Status: app.Status.Valid ? app.Status.String : "unknown",
         CreatedAt: app.CreatedAt.Valid ? app.CreatedAt.Time : null,
         ReviewedAt: app.ReviewedAt.Valid ? app.ReviewedAt.Time : null,
         ReviewedBy: app.ReviewedBy ?? "Not reviewed yet",
+        ReviewerName: app.ReviewerName.Valid
+          ? app.ReviewerName.String
+          : "Not reviewed yet",
       }));
 
       setApplicationsData(formattedData);
@@ -139,7 +143,7 @@ const Applications: React.FC = () => {
                     {new Date(app.CreatedAt).toLocaleDateString()}
                   </TableCell>
                   <TableCell align="center">
-                    {app.ReviewedBy ? app.ReviewedBy : "Not reviewed yet"}
+                    {app.ReviewerName ? app.ReviewerName : "Not reviewed yet"}
                   </TableCell>
                   <TableCell align="center">
                     <Button

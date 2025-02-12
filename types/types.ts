@@ -37,9 +37,10 @@ export interface ContributorApplications {
   Status: "pending" | "approved" | "rejected";
   CreatedAt: string;
   ReviewedBy: string | null;
+  ReviewerName: string | null;
 }
 
-type ContributorApplication = {
+export interface ContributorApplication {
   ContriAppID: string;
   UserID: string;
   ExpertiseProofs: string[];
@@ -48,6 +49,7 @@ type ContributorApplication = {
   Status: { String: string; Valid: boolean };
   CreatedAt: { Time: string; Valid: boolean };
   ReviewedAt: { Time: string; Valid: boolean };
+  ReviewerName: { String: string; Valid: boolean };
   Name: string;
   Username: string;
-};
+}
