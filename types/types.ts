@@ -29,3 +29,25 @@ export interface Following {
   Name: string;
   Username: string;
 }
+
+export interface ContributorApplications {
+  ContriAppID: string;
+  UserID: string;
+  Name: string;
+  Status: "pending" | "approved" | "rejected";
+  CreatedAt: string;
+  ReviewedBy: string | null;
+}
+
+type ContributorApplication = {
+  ContriAppID: string;
+  UserID: string;
+  ExpertiseProofs: string[];
+  IdentityProof: string;
+  InitialSubmission: string;
+  Status: { String: string; Valid: boolean };
+  CreatedAt: { Time: string; Valid: boolean };
+  ReviewedAt: { Time: string; Valid: boolean };
+  Name: string;
+  Username: string;
+};

@@ -39,6 +39,7 @@ const OtherUserProfilePage = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [editForm, setEditForm] = useState({
     username: "",
     name: "",
@@ -48,6 +49,10 @@ const OtherUserProfilePage = () => {
   useEffect(() => {
     if (userData && currentUser) {
       setIsOwnProfile(userData.user_id === currentUser.user_id);
+    }
+
+    if (currentUser?.role === "admin" || currentUser?.role === "moderator") {
+      setIsAdmin(true);
     }
   }, [currentUser, userData]);
 
@@ -332,6 +337,7 @@ const OtherUserProfilePage = () => {
               followings={followings}
               isOwnProfile={isOwnProfile}
               onUnfollow={getFollowings}
+              isAdmin={isAdmin}
             />
           )}
           {tabLabels[tabValue] === "Saved Posts" && (

@@ -202,6 +202,17 @@ export const api = {
       const response = await privateApi.get(`/posts/${slug}/comments`);
       return response.data;
     },
+    getContributorApplications: async () => {
+      const response = await privateApi.get("/admin/contributor_applications");
+      return response.data;
+    },
+
+    getContributorApplication: async (id: string) => {
+      const response = await privateApi.get(
+        `/admin/contributor_applications/${id}`
+      );
+      return response.data;
+    },
   },
 };
 

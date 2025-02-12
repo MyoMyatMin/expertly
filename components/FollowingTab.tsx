@@ -7,12 +7,14 @@ interface FollowingTabProps {
   followings: Following[];
   isOwnProfile: boolean;
   onUnfollow: () => void;
+  isAdmin: boolean;
 }
 
 const FollowingTab = ({
   followings,
   isOwnProfile,
   onUnfollow,
+  isAdmin,
 }: FollowingTabProps) => {
   const router = useRouter();
 
@@ -75,7 +77,7 @@ const FollowingTab = ({
               </Typography>
             </Box>
           </Box>
-          {isOwnProfile && (
+          {isOwnProfile && !isAdmin && (
             <Button
               variant="outlined"
               color="primary"
