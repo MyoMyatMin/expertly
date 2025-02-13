@@ -113,6 +113,10 @@ export const api = {
       );
       return reponse.data;
     },
+    getPosts: async () => {
+      const response = await publicApi.get("/posts");
+      return response.data;
+    },
   },
   protected: {
     getMe: async () => {
@@ -271,6 +275,11 @@ export const api = {
       console.log("Creating contributor application", data);
       const response = await privateApi.post("/contributor_application", data);
 
+      return response.data;
+    },
+
+    getFollowingFeed: async () => {
+      const response = await privateApi.get("/feed");
       return response.data;
     },
   },
