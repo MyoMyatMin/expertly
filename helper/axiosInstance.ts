@@ -241,6 +241,31 @@ export const api = {
       );
       return response.data;
     },
+
+    getAppealsForContributors: async () => {
+      const response = await privateApi.get("/admin/contributors/appeals");
+      return response.data;
+    },
+
+    getAppealsForUsers: async () => {
+      const response = await privateApi.get("/admin/users/appeals");
+      console.log("User appeals", response.data);
+      return response.data;
+    },
+
+    getAppealsByID: async (appealID: string) => {
+      const response = await privateApi.get(`/admin/appeals/${appealID}`);
+      return response.data;
+    },
+
+    updateAppealStatus: async (appealID: string, status: string) => {
+      console.log("Updating appeal status", appealID, status);
+      const response = await privateApi.put(
+        `/admin/appeals/${appealID}/status`,
+        { status }
+      );
+      return response.data;
+    },
   },
 };
 

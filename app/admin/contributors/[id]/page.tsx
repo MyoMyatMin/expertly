@@ -1,40 +1,20 @@
 "use client";
 import { useParams, useRouter } from "next/navigation";
 import { Container, Typography, Box, Avatar, Button } from "@mui/material";
-
+import { api } from "@/helper/axiosInstance";
+import { Appeal } from "@/types/types";
+import { useState } from "react";
 type Props = {};
 
 const AppealDetails = (props: Props) => {
-  const appeals = [
-    {
-      id: 1,
-      profileImage:
-        "https://cdn.prod.website-files.com/6600e1eab90de089c2d9c9cd/662c092880a6d18c31995e13_66236537d4f46682e079b6ce_Casual%2520Portrait.webp",
-      name: "Michael Lee",
-      email: "michealee@au.edu",
-      postLink: "https://www.expertly.com/?fbid=169272510490",
-      reason: "Policy Violation",
-      justification:
-        "The content complies with the guidelines and was misinterpreted.",
-      reportedComment: "This is an unfair violation notice.",
-    },
-    {
-      id: 2,
-      profileImage:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRinxUlZyH5cwOafVdjDcAxHgoFIxolEy_gkw&s",
-      name: "Emily Clark",
-      email: "emilycalrk@gmil.com",
-      postLink: "https://www.expertly.com/7670&set=pcb.1692728351574012",
-      reason: "Copyright Infringement",
-      justification: "This is my original work, not copied from any source.",
-      reportedComment: "Content flagged without evidence.",
-    },
-  ];
-
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
   const router = useRouter();
+  const [appeal, setAppeal] = useState<Appeal | null>(null);
 
-  const appeal = appeals.find((a) => a.id === parseInt(id || "", 10));
+  const getAppeal = async () => {
+    const response = await api.protected.getAppealsByID(id as string);
+    setAppeal(response);
+  };
 
   if (!appeal) {
     return (
@@ -53,28 +33,46 @@ const AppealDetails = (props: Props) => {
       </Typography>
 
       <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
-        <Avatar src={appeal.profileImage} sx={{ width: 100, height: 100, mr: 3 }} />
+        <Avatar
+          src="https://unsplash.com/photos/1vZMjYzZp0Y"
+          sx={{ width: 100, height: 100, mr: 3 }}
+        />
         <Box>
-          <Typography variant="h5" fontWeight="bold">{appeal.name}</Typography>
-          <Typography variant="body1" sx={{ color: "gray" }}>{appeal.email}</Typography>
+          <Typography variant="h5" fontWeight="bold">
+            {appeal.AppealedByName.Valid
+              ? appeal.AppealedByName.String
+              : "Unknown"}
+          </Typography>
         </Box>
       </Box>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
         <Box sx={{ borderBottom: "2px solid #ccc", pb: 2 }}>
-          <Typography><strong>Report Details:</strong> {appeal.reason}</Typography>
+          <Typography>
+            <strong>Report Details:</strong> {appeal.AppealReason}
+          </Typography>
         </Box>
 
         <Box sx={{ borderBottom: "2px solid #ccc", pb: 2 }}>
-          <Typography><strong>Reported Comments:</strong> {appeal.reportedComment}</Typography>
+          <Typography>
+            <strong>Reported Comments:</strong>{" "}
+            {appeal.CommentContent.Valid
+              ? appeal.CommentContent.String
+              : "No comments found"}
+          </Typography>
         </Box>
 
         <Box sx={{ borderBottom: "2px solid #ccc", pb: 2 }}>
-          <Typography><strong>Justification:</strong> {appeal.justification}</Typography>
+          <Typography>
+            <strong>Justification:</strong> {appeal.AppealReason}
+          </Typography>
         </Box>
 
         <Box sx={{ borderBottom: "2px solid #ccc", pb: 2 }}>
-          <Typography><strong>Post/Comment Link:</strong> {appeal.postLink}</Typography>
+          <Typography>
+            <strong>Post/Comment Link:</strong>{" "}
+            {appeal.PostSlug.Valid ? appeal.PostSlug.String : "N/A"}
+          </Typography>
         </Box>
       </Box>
 

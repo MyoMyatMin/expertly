@@ -17,13 +17,15 @@ import {
   Alert,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { Report } from "@/types/types";
+import { Appeals, Report } from "@/types/types";
 import { api } from "@/helper/axiosInstance";
 import ReportTable from "@/components/ReportTable";
+import AppealTable from "@/components/AppealTable";
 
 const ManageContributors = () => {
   const [tabValue, setTabValue] = useState(0);
   const [reports, setReports] = useState<Report[]>([]);
+  const [appeals, setAppeals] = useState<Appeals[]>([]);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
@@ -33,6 +35,15 @@ const ManageContributors = () => {
     try {
       const response = await api.protected.getReportsForContributors();
       setReports(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getAppealedContributors = async () => {
+    try {
+      const response = await api.protected.getAppealsForContributors();
+      setAppeals(response);
     } catch (error) {
       console.error(error);
     }
@@ -51,6 +62,7 @@ const ManageContributors = () => {
 
   useEffect(() => {
     getReportedContributors();
+    getAppealedContributors();
   }, []);
 
   return (
@@ -75,6 +87,7 @@ const ManageContributors = () => {
       {tabValue === 0 && (
         <ReportTable reports={reports} updateStatus={updateStats} />
       )}
+      {tabValue === 1 && <AppealTable appeals={appeals} />}
     </Container>
   );
 };

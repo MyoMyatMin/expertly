@@ -16,15 +16,17 @@ import {
   useTheme,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { Report } from "../../../types/types";
+import { Report, Appeals } from "../../../types/types";
 import { api } from "@/helper/axiosInstance";
 import ReportTable from "@/components/ReportTable";
+import AppealTable from "@/components/AppealTable";
 
 type Props = {};
 
 const UsersAction = (props: Props) => {
   const [tabValue, setTabValue] = useState(0);
   const [reports, setReports] = useState<Report[]>([]);
+  const [appeals, setAppeals] = useState<Appeals[]>([]);
   const router = useRouter();
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
@@ -38,11 +40,22 @@ const UsersAction = (props: Props) => {
     await api.protected.updateReportStatus(reportID, status);
     getReportedUsers();
   };
+
+  const getAppealedUsers = async () => {
+    console.log("Getting appealed users");
+    try {
+      const response = await api.protected.getAppealsForUsers();
+      setAppeals(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
   useEffect(() => {
     getReportedUsers();
+    getAppealedUsers();
   }, []);
 
   return (
@@ -61,6 +74,7 @@ const UsersAction = (props: Props) => {
         {tabValue === 0 && (
           <ReportTable reports={reports} updateStatus={updateStatus} />
         )}
+        {tabValue === 1 && <AppealTable appeals={appeals} />}
       </Container>
     </>
   );

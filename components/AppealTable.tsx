@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -8,167 +8,170 @@ import {
   TableRow,
   Button,
   Box,
+  TablePagination,
+  TableSortLabel,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { Report } from "@/types/types";
+import { Appeals } from "@/types/types";
 
-type ReportTableProps = {
-  reports: Report[];
+type AppealTableProps = {
+  appeals: Appeals[];
 };
 
-const ReportTable: React.FC<ReportTableProps> = ({ reports }) => {
+type Order = "asc" | "desc";
+
+const AppealTable: React.FC<AppealTableProps> = ({ appeals }) => {
   const router = useRouter();
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [order, setOrder] = useState<Order>("asc");
+  const [orderBy, setOrderBy] = useState<keyof Appeals>("AppealedByUsername");
+
+  const handleRequestSort = (property: keyof Appeals) => {
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
+    setOrderBy(property);
+  };
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const sortedAppeals = appeals.sort((a, b) => {
+    if (a[orderBy] !== null && b[orderBy] !== null) {
+      if (a[orderBy] < b[orderBy]) {
+        return order === "asc" ? -1 : 1;
+      }
+      if (a[orderBy] > b[orderBy]) {
+        return order === "asc" ? 1 : -1;
+      }
+    }
+    return 0;
+  });
+
+  const paginatedAppeals = sortedAppeals.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+
+  const tableHeaders = [
+    { id: "AppealedByUsername", label: "Appealed By" },
+    { id: "Reason", label: "Justification" },
+    { id: "TargetReportReason", label: "Reported Reason" },
+    { id: "Status", label: "Status" },
+    { id: "CreatedAt", label: "Appealed At" },
+    { id: "ReviewerName", label: "Reviewed By" },
+    { id: "Actions", label: "Actions" },
+  ];
 
   return (
     <Box sx={{ mt: 4, overflowX: "auto" }}>
-      <Table>
+      <Table
+        sx={{
+          minWidth: 800,
+          border: "1px solid #e0e0e0",
+          borderRadius: "8px",
+        }}
+      >
         <TableHead>
-          <TableRow>
-            <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
-              Reported By
-            </TableCell>
-            <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
-              Target User
-            </TableCell>
-            <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
-              Reason
-            </TableCell>
-            <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
-              Status
-            </TableCell>
-            <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
-              Reported Content
-            </TableCell>
-            <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
-              Actions
-            </TableCell>
+          <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+            {tableHeaders.map((header) => (
+              <TableCell
+                key={header.id}
+                sx={{
+                  fontWeight: "bold",
+                  fontSize: "15px",
+                  padding: "12px",
+                }}
+                sortDirection={orderBy === header.id ? order : false}
+              >
+                <TableSortLabel
+                  active={orderBy === header.id}
+                  direction={orderBy === header.id ? order : "asc"}
+                  onClick={() => handleRequestSort(header.id as keyof Appeals)}
+                >
+                  {header.label}
+                </TableSortLabel>
+              </TableCell>
+            ))}
           </TableRow>
         </TableHead>
         <TableBody>
-          {reports.map((report) => (
-            <TableRow key={report.ReportID}>
+          {paginatedAppeals.map((appeal) => (
+            <TableRow key={appeal.AppealID} hover>
               <TableCell>
                 <Button
                   variant="text"
                   color="primary"
                   onClick={() =>
-                    router.push(`/profile/${report.ReportedByUsername.String}`)
+                    router.push(`/profile/${appeal.AppealedByUsername.String}`)
                   }
                 >
-                  {report.ReportedByName.Valid
-                    ? report.ReportedByName.String
+                  {appeal.AppealedByUsername.Valid
+                    ? appeal.AppealedByUsername.String
                     : "N/A"}
                 </Button>
               </TableCell>
+              <TableCell>{appeal.Reason}</TableCell>
               <TableCell>
-                <Button
-                  variant="text"
-                  color="primary"
-                  onClick={() =>
-                    router.push(`/profile/${report.TargetUsername.String}`)
-                  }
-                >
-                  {report.TargetName.Valid ? report.TargetName.String : "N/A"}
-                </Button>
+                {appeal.TargetReportReason.Valid
+                  ? appeal.TargetReportReason.String
+                  : "N/A"}
               </TableCell>
-              <TableCell>{report.Reason}</TableCell>
-              <TableCell>
-                {report.Status.Valid ? report.Status.String : "Unknown"}
+              <TableCell
+                sx={{
+                  fontWeight: "bold",
+                  color:
+                    appeal.Status.String === "pending" ? "#ff9800" : "#4caf50",
+                }}
+              >
+                {appeal.Status.Valid ? appeal.Status.String : "Unknown"}
               </TableCell>
               <TableCell>
-                {report.TargetPostSlug.Valid ? (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    size="small"
-                    onClick={() =>
-                      router.push(`/posts/${report.TargetPostSlug.String}`)
-                    }
-                  >
-                    View Post
-                  </Button>
-                ) : report.TargetComment.Valid ? (
-                  <Box>
-                    <p>{report.TargetComment.String}</p>
-                  </Box>
-                ) : (
-                  "N/A"
-                )}
+                {appeal.CreatedAt.Valid
+                  ? new Date(appeal.CreatedAt.Time).toLocaleDateString()
+                  : "N/A"}
+              </TableCell>
+              <TableCell>
+                {appeal.ReviewerName?.Valid
+                  ? appeal.ReviewerName.String
+                  : "N/A"}
               </TableCell>
               <TableCell>
                 <Button
                   variant="contained"
                   color="secondary"
                   size="small"
+                  sx={{ borderRadius: "8px" }}
                   onClick={() =>
-                    router.push(`/admin/reports/${report.ReportID}`)
+                    router.push(`/admin/appeals/${appeal.AppealID}`)
                   }
                 >
-                  Review
+                  View
                 </Button>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={appeals.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
     </Box>
   );
 };
 
-export default ReportTable;
-
-// {tabValue === 1 && (
-//   <Box sx={{ mt: 4 }}>
-//     <Box sx={{ overflowX: "auto" }}>
-//       <Table>
-//         <TableHead>
-//           <TableRow>
-//             <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
-//               Profile
-//             </TableCell>
-//             <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
-//               Name
-//             </TableCell>
-//             <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
-//               Post Link
-//             </TableCell>
-//             <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
-//               Reason
-//             </TableCell>
-//             <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
-//               Justification
-//             </TableCell>
-//             <TableCell sx={{ fontWeight: "bold", fontSize: "15px" }}>
-//               Action
-//             </TableCell>
-//           </TableRow>
-//         </TableHead>
-//         <TableBody>
-//           {appeals.map((appeal) => (
-//             <TableRow key={appeal.id}>
-//               <TableCell>
-//                 <Avatar src={appeal.profileImage} alt={appeal.name} />
-//               </TableCell>
-//               <TableCell>{appeal.name}</TableCell>
-//               <TableCell>{appeal.postLink}</TableCell>
-//               <TableCell>{appeal.reason}</TableCell>
-//               <TableCell>{appeal.justification}</TableCell>
-//               <TableCell>
-//                 <Button
-//                   variant="contained"
-//                   color="secondary"
-//                   size="small"
-//                   onClick={() =>
-//                     router.push(`/admin/users/${appeal.id}`)
-//                   }
-//                 >
-//                   View
-//                 </Button>
-//               </TableCell>
-//             </TableRow>
-//           ))}
-//         </TableBody>
-//       </Table>
-//     </Box>
-//   </Box>
-// )}
+export default AppealTable;

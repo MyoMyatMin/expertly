@@ -62,7 +62,7 @@ export interface Report {
   ReportedTargetCommentID: string | null;
   Reason: string;
   Status: {
-    String: "pending" | "resolved";
+    String: "pending" | "resolved" | "dismissed";
     Valid: boolean;
   };
   ReviewedAt: {
@@ -99,6 +99,104 @@ export interface Report {
   };
   CommentID: string | null;
   TargetComment: {
+    String: string;
+    Valid: boolean;
+  };
+  ReviewerName: {
+    String: string;
+    Valid: boolean;
+  };
+}
+
+export interface Appeals {
+  AppealID: string;
+  AppealedBy: string;
+  TargetReportID: string;
+  Reason: string;
+  Status: {
+    String: string;
+    Valid: boolean;
+  };
+  ReviewedAt: {
+    Time: string;
+    Valid: boolean;
+  };
+  Reviewedby: string;
+  CreatedAt: {
+    Time: string;
+    Valid: boolean;
+  };
+  AppealedByID: string;
+  AppealedByName: {
+    String: string;
+    Valid: boolean;
+  };
+  AppealedByUsername: {
+    String: string;
+    Valid: boolean;
+  };
+  TargetReportID_2: string;
+  TargetReportReason: {
+    String: string;
+    Valid: boolean;
+  };
+  TargetPostID: string;
+  TargetUserID: string;
+  TargetCommentID: string | null;
+  ReviewerName: {
+    String: string;
+    Valid: boolean;
+  };
+}
+
+export interface Appeal {
+  AppealID: string;
+  AppealedBy: string;
+  TargetReportID: string;
+  AppealReason: string;
+  AppealStatus: {
+    String: "pending" | "resolved" | "dismissed";
+    Valid: boolean;
+  };
+  ReviewedAt: {
+    Time: string;
+    Valid: boolean;
+  };
+  Reviewedby: string;
+  CreatedAt: {
+    Time: string;
+    Valid: boolean;
+  };
+  AppealedByID: string;
+  AppealedByName: {
+    String: string;
+    Valid: boolean;
+  };
+  TargetReportID_2: string;
+  TargetReportReason: {
+    String: string;
+    Valid: boolean;
+  };
+  TargetPostID: string;
+  TargetUserID: string;
+  TargetCommentID: string | null;
+  CommentContent: {
+    String: string;
+    Valid: boolean;
+  };
+  PostSlug: {
+    String: string;
+    Valid: boolean;
+  };
+  TargetUserSuspendedUntil: {
+    Time: string;
+    Valid: boolean;
+  };
+  TargetUserName: {
+    String: string;
+    Valid: boolean;
+  };
+  TargetUserUsername: {
     String: string;
     Valid: boolean;
   };
