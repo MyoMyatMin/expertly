@@ -224,6 +224,23 @@ export const api = {
       console.log("Application status updated", response.data);
       return response.data;
     },
+    getReportsForContributors: async () => {
+      const response = await privateApi.get("/admin/contributors/reports");
+      return response.data;
+    },
+
+    getReportsForUsers: async () => {
+      const response = await privateApi.get("/admin/users/reports");
+      return response.data;
+    },
+
+    updateReportStatus: async (reportID: string, status: string) => {
+      const response = await privateApi.put(
+        `/admin/reports/${reportID}/status`,
+        { status }
+      );
+      return response.data;
+    },
   },
 };
 

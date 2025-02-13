@@ -53,3 +53,57 @@ export interface ContributorApplication {
   Name: string;
   Username: string;
 }
+
+export interface Report {
+  ReportID: string;
+  ReportedBy: string;
+  ReportedTargetPostID: string;
+  TargetUserID: string;
+  ReportedTargetCommentID: string | null;
+  Reason: string;
+  Status: {
+    String: "pending" | "resolved";
+    Valid: boolean;
+  };
+  ReviewedAt: {
+    Time: string;
+    Valid: boolean;
+  };
+  ReviewedBy: string | null;
+  CreatedAt: {
+    Time: string;
+    Valid: boolean;
+  };
+  ReportedByID: string;
+  ReportedByName: {
+    String: string;
+    Valid: boolean;
+  };
+  ReportedByUsername: {
+    String: string;
+    Valid: boolean;
+  };
+  TargetUserID_2: string;
+  TargetName: {
+    String: string;
+    Valid: boolean;
+  };
+  TargetUsername: {
+    String: string;
+    Valid: boolean;
+  };
+  PostID: string;
+  TargetPostSlug: {
+    String: string;
+    Valid: boolean;
+  };
+  CommentID: string | null;
+  TargetComment: {
+    String: string;
+    Valid: boolean;
+  };
+  ReviewerName: {
+    String: string;
+    Valid: boolean;
+  };
+}
