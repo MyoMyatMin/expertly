@@ -266,6 +266,13 @@ export const api = {
       );
       return response.data;
     },
+
+    createContributorApplication: async (data: {}) => {
+      console.log("Creating contributor application", data);
+      const response = await privateApi.post("/contributor_application", data);
+
+      return response.data;
+    },
   },
 };
 
