@@ -239,7 +239,7 @@ const Feed = () => {
             </Typography>
           </Box>
         ) : (
-          (tabValue === 0 ? posts : followingPosts ?? []).map((post) => (
+          (tabValue === 0 ? posts??[] : followingPosts ?? []).map((post) => (
             <Post
               key={post.PostID}
               tab={tabValue}

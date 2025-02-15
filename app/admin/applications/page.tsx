@@ -34,7 +34,7 @@ const Applications: React.FC = () => {
       const res = await api.protected.getContributorApplications();
 
       // Transform data to match the expected structure
-      const formattedData = res.map((app: any) => ({
+      const formattedData = res??[].map((app : any) => ({
         ...app,
 
         Status: app.Status.Valid ? app.Status.String : "unknown",

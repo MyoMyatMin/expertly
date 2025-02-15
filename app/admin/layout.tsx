@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import AuthContext from "@/contexts/AuthProvider";
@@ -9,13 +9,13 @@ import {
   List,
   ListItem,
   ListItemText,
-  Divider,
-  AppBar,
-  Toolbar,
-  Typography,
+  IconButton,
+  useMediaQuery,
+  Theme,
 } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 
-const drawerWidth = 250;
+const drawerWidth = 200;
 
 // Define the navigation links for the Admin section
 const navLinks = [
@@ -27,61 +27,103 @@ const navLinks = [
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const { user } = useContext(AuthContext);
+  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm")); // Check if the screen is small
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State to manage sidebar visibility on mobile
 
   if (pathname === "/admin") {
     return null;
   }
 
-  return (
-    <Box sx={{ display: "flex", minHeight: "100vh" }}>
-      {/* Top Header */}
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
 
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column" }}>
       {/* Sidebar Navigation */}
       {user && (user.role === "admin" || user.role === "moderator") && (
-        <Drawer
-          variant="permanent"
-          sx={{
-            width: drawerWidth,
-            flexShrink: 0,
-            [`& .MuiDrawer-paper`]: {
+        <>
+          {/* Mobile Drawer (Temporary) */}
+          <Drawer
+            variant="temporary"
+            open={isSidebarOpen}
+            onClose={toggleSidebar}
+            sx={{
+              display: { xs: "block", sm: "none" }, // Only show on mobile
               width: drawerWidth,
-              boxSizing: "border-box",
-              mt: 8,
-            },
-          }}
-        >
-          <List>
-            {navLinks.map((link) => (
-              <ListItem key={link.href} component={Link} href={link.href}>
-                <ListItemText
-                  primary={link.label}
-                  sx={{
-                    color: pathname === link.href ? "#ff006e" : "black",
-                    textDecoration: "none",
-                  }}
-                />
-              </ListItem>
-            ))}
-          </List>
-        </Drawer>
-      )}
+              [`& .MuiDrawer-paper`]: {
+                width: drawerWidth,
+                boxSizing: "border-box",
+                bgcolor: "background.default",
+              },
+            }}
+          >
+            <List>
+              {navLinks.map((link) => (
+                <ListItem key={link.href} component={Link} href={link.href}>
+                  <ListItemText
+                    primary={link.label}
+                    sx={{
+                      color: pathname === link.href ? "#ff006e" : "black",
+                      textDecoration: "none",
+                    }}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Drawer>
 
-      <Divider orientation="vertical" flexItem />
+          {/* Desktop Drawer (Permanent) */}
+          <Drawer
+            variant="permanent"
+            sx={{
+              display: { xs: "none", sm: "block" }, 
+              width: drawerWidth,
+              flexShrink: 0,
+              [`& .MuiDrawer-paper`]: {
+                width: drawerWidth,
+                boxSizing: "border-box",
+                mt: 8,
+                bgcolor: "background.default",
+              },
+            }}
+          >
+            <List>
+              {navLinks.map((link) => (
+                <ListItem key={link.href} component={Link} href={link.href}>
+                  <ListItemText
+                    primary={link.label}
+                    sx={{
+                      color: pathname === link.href ? "#ff006e" : "black",
+                      textDecoration: "none",
+                    }}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Drawer>
+        </>
+      )}
 
       {/* Main Content */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          overflow: "auto",
-          mt: 8, // Ensure the content is pushed down below the header
           ml:
-            user && (user.role === "admin" || user.role === "moderator")
+            user && (user.role === "admin" || user.role === "moderator") && !isMobile
               ? `${drawerWidth}px`
               : 0,
           p: 3,
+          transition: "margin-left 0.3s",
         }}
       >
+        {/* Mobile Menu Button */}
+        {user && (user.role === "admin" || user.role === "moderator") && isMobile && (
+          <IconButton onClick={toggleSidebar} sx={{ mb: 2 }}>
+            <MenuIcon />
+          </IconButton>
+        )}
         {children}
       </Box>
     </Box>
