@@ -111,6 +111,7 @@ export const api = {
         },
         { withCredentials: true }
       );
+      console.log("Moderator signed in", reponse.data);
       return reponse.data;
     },
     getPosts: async () => {

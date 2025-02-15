@@ -18,7 +18,7 @@ const Feed = () => {
   const [reportPostId, setReportPostId] = useState<string | null>(null);
   const [reportReason, setReportReason] = useState("");
   const [customReason, setCustomReason] = useState("");
-  const [followingPosts, setFollowingPosts] = useState<PostType[]>([]);
+  const [followingPosts, setFollowingPosts] = useState<PostType[] | null>(null);
   const { user } = useContext(AuthContext);
   const [posts, setPosts] = useState<PostType[]>([]);
 
@@ -38,8 +38,12 @@ const Feed = () => {
       console.error("Error fetching following posts:", error);
     }
   };
-  const handleTabChange = (_: React.SyntheticEvent, newValue: number) =>
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
+    if (newValue === 1 && user) {
+      getFollowingPosts();
+    }
+  };
   const handleLike = (postId: string) =>
     setLikedPosts((prev) =>
       prev.includes(postId)
@@ -62,35 +66,44 @@ const Feed = () => {
 
   useEffect(() => {
     getAllPosts();
-    if (user) {
-      getFollowingPosts();
-    }
-  }, [user]);
+  }, []);
+
+  const shouldShowFollowingTab =
+    user && !["admin", "moderator"].includes(user.role);
 
   return (
     <Box sx={{ maxWidth: 1000, mx: "auto", mt: 4, px: 2 }}>
       <Tabs value={tabValue} onChange={handleTabChange} sx={{ mb: 2 }}>
         <Tab label="For You" />
-        {user && <Tab label="Following" />}
+        {shouldShowFollowingTab && <Tab label="Following" />}
       </Tabs>
 
       <Box>
-        {(tabValue === 0 ? posts : followingPosts).map((post) => (
-          <Post
-            key={post.PostID}
-            post={{
-              ...post,
-              Content: removeImagesFromMarkdown(post.Content),
-            }}
-            onLike={handleLike}
-            onReport={(id: React.SetStateAction<string | null>) =>
-              setReportPostId(id)
-            }
-            onSave={handleSave}
-            isLiked={likedPosts.includes(post.PostID)}
-            isSaved={savedPosts.includes(post.PostID)}
-          />
-        ))}
+        {tabValue === 1 && (!followingPosts || followingPosts.length === 0) ? (
+          <Box sx={{ textAlign: "center", mt: 5 }}>
+            <Typography variant="h6" gutterBottom>
+              Your following does not have posts yet.
+            </Typography>
+          </Box>
+        ) : (
+          (tabValue === 0 ? posts : followingPosts ?? []).map((post) => (
+            <Post
+              key={post.PostID}
+              tab={tabValue}
+              post={{
+                ...post,
+                Content: removeImagesFromMarkdown(post.Content),
+              }}
+              onLike={handleLike}
+              onReport={(id: React.SetStateAction<string | null>) =>
+                setReportPostId(id)
+              }
+              onSave={handleSave}
+              isLiked={likedPosts.includes(post.PostID)}
+              isSaved={savedPosts.includes(post.PostID)}
+            />
+          ))
+        )}
       </Box>
 
       <ReportModal

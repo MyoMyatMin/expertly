@@ -8,6 +8,7 @@ import { Post as PostType } from "@/types/types";
 import AuthContext from "@/contexts/AuthProvider";
 
 type PostComponentProps = {
+  tab: number;
   post: PostType;
   onLike: (postId: string) => void;
   onReport: (postId: string) => void;
@@ -17,6 +18,7 @@ type PostComponentProps = {
 };
 
 const Post = ({
+  tab,
   post,
   onLike,
   onReport,
@@ -26,6 +28,7 @@ const Post = ({
 }: PostComponentProps) => {
   const router = useRouter();
   const { user } = useContext(AuthContext);
+
   return (
     <Card
       sx={{ mb: 2, cursor: "pointer" }}

@@ -23,8 +23,9 @@ import AppealsTab from "@/components/AppealTab";
 import { api } from "@/helper/axiosInstance";
 import { User, Post, Following } from "@/types/types";
 import AuthContext from "@/contexts/AuthProvider";
+import { withRole } from "@/app/hocs/withAuth";
 
-const OtherUserProfilePage = () => {
+const UserProfilePage = () => {
   const router = useRouter();
   const { user: currentUser } = useContext(AuthContext);
   const { username } = useParams();
@@ -312,7 +313,8 @@ const OtherUserProfilePage = () => {
                 Edit Profile
               </Button>
             ) : (
-              !isOwnProfile && (
+              !isOwnProfile &&
+              !isAdmin && (
                 <Button
                   variant={isFollowing ? "outlined" : "contained"}
                   onClick={handleFollow}
@@ -357,4 +359,9 @@ const OtherUserProfilePage = () => {
   );
 };
 
-export default OtherUserProfilePage;
+export default withRole(UserProfilePage, [
+  "user",
+  "contributor",
+  "admin",
+  "moderator",
+]);

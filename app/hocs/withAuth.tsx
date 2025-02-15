@@ -1,29 +1,59 @@
-// app/hocs/withAuth.tsx
-
+"use client";
 import { useAuth } from "@/contexts/AuthProvider"; // Adjust the import based on your context location
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Box, CircularProgress, Typography, Button } from "@mui/material";
 
-// A Higher-Order Component (HOC) that wraps any component and handles authentication
-const withAuth = (WrappedComponent: React.ComponentType) => {
+const withRole = (WrappedComponent: React.ComponentType, roles: string[]) => {
   const Wrapper = (props: any) => {
     const { user, loading } = useAuth();
-    console.log("User:", user);
     const router = useRouter();
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-      // If user is not authenticated, redirect to login page
+      setMounted(true);
+
       if (!user && !loading) {
         router.push("/auth/signin");
       }
     }, [user, loading, router]);
 
-    if (loading) {
-      return <div>Loading...</div>; // Optionally show a loading state while checking authentication
+    // On first render (server + first client render), show loading
+    // This ensures consistent rendering between server and client
+    if (!mounted) {
+      return (
+        <Box sx={{ textAlign: "center", mt: 5 }}>
+          <CircularProgress />
+        </Box>
+      );
     }
 
-    if (!user) {
-      return null; // Alternatively, you can show a blank screen or placeholder
+    if (loading) {
+      return (
+        <Box sx={{ textAlign: "center", mt: 5 }}>
+          <CircularProgress />
+        </Box>
+      );
+    }
+
+    if (!user || !roles.includes(user.role)) {
+      return (
+        <Box sx={{ textAlign: "center", mt: 5 }}>
+          <Typography variant="h6" gutterBottom>
+            You do not have permission to access this page.
+          </Typography>
+
+          {user?.role !== "moderator" && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => router.push(`/profile/${user?.username || ""}`)}
+            >
+              Go to Your Profile
+            </Button>
+          )}
+        </Box>
+      );
     }
 
     return <WrappedComponent {...props} />;
@@ -32,4 +62,19 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
   return Wrapper;
 };
 
-export default withAuth;
+const WithContributor = (WrappedComponent: React.ComponentType) =>
+  withRole(WrappedComponent, ["contributor"]);
+const WithAdmin = (WrappedComponent: React.ComponentType) =>
+  withRole(WrappedComponent, ["admin"]);
+const WithModerator = (WrappedComponent: React.ComponentType) =>
+  withRole(WrappedComponent, ["moderator", "admin"]);
+const WithContributorOrUser = (WrappedComponent: React.ComponentType) =>
+  withRole(WrappedComponent, ["contributor", "user"]);
+
+export {
+  withRole,
+  WithContributor,
+  WithAdmin,
+  WithModerator,
+  WithContributorOrUser,
+};

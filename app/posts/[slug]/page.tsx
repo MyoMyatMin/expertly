@@ -16,6 +16,7 @@ import { api } from "@/helper/axiosInstance";
 import { useParams, useRouter } from "next/navigation";
 import BlogEditor from "@/components/BlogEditor";
 import AuthContext from "@/contexts/AuthProvider";
+import { withRole } from "@/app/hocs/withAuth";
 
 type CommentType = {
   id: string;
@@ -38,6 +39,7 @@ const PostDetail = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [authorName, setAuthorName] = useState("");
+  const [authorUsername, setAuthorUsername] = useState("");
   const [authorId, setAuthorId] = useState("");
   const [createdAt, setCreatedAt] = useState("");
   const [upvoteCount, setUpvoteCount] = useState(0);
@@ -62,6 +64,7 @@ const PostDetail = () => {
         setContent(postResponse.Content);
         setAuthorName(postResponse.AuthorName);
         setAuthorId(postResponse.UserID);
+        setAuthorUsername(postResponse.AuthorUsername);
         setCreatedAt(
           new Date(postResponse.CreatedAt.Time).toLocaleDateString()
         );
@@ -200,6 +203,9 @@ const PostDetail = () => {
     ));
   };
 
+  const isAdminOrModerator =
+    CurrentUser?.role === "admin" || CurrentUser?.role === "moderator";
+
   return (
     <Box sx={{ maxWidth: 1000, mx: "auto", mt: 4, px: 2 }}>
       <Box
@@ -263,7 +269,11 @@ const PostDetail = () => {
           <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
             <Avatar sx={{ mr: 2 }}>{authorName[0]}</Avatar>
             <Box>
-              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+              <Typography
+                variant="subtitle1"
+                sx={{ fontWeight: 600, cursor: "pointer" }}
+                onClick={() => router.push(`/profile/${authorUsername}`)}
+              >
                 {authorName}
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -296,10 +306,16 @@ const PostDetail = () => {
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              <IconButton onClick={handleUpvote}>
-                <ThumbUp color={hasUpvoted ? "primary" : "inherit"} />
-              </IconButton>
-              <Typography variant="caption">{upvoteCount} Votes</Typography>
+              {!isAdminOrModerator ? (
+                <>
+                  <IconButton onClick={handleUpvote}>
+                    <ThumbUp color={hasUpvoted ? "primary" : "inherit"} />
+                  </IconButton>
+                  <Typography variant="caption">{upvoteCount} Votes</Typography>
+                </>
+              ) : (
+                <Typography variant="caption">{upvoteCount} Upvotes</Typography>
+              )}
             </Box>
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <IconButton>
@@ -315,42 +331,49 @@ const PostDetail = () => {
             Comments
           </Typography>
           {renderComments(comments)}
-          <Box sx={{ mt: 2 }}>
-            {replyCommentId && (
-              <Typography variant="caption" sx={{ mb: 1, display: "block" }}>
-                Replying to: @{replyingToUsername}
-                <Button
+          {!isAdminOrModerator && (
+            <Box sx={{ mt: 2 }}>
+              {replyCommentId && (
+                <Typography variant="caption" sx={{ mb: 1, display: "block" }}>
+                  Replying to: @{replyingToUsername}
+                  <Button
+                    size="small"
+                    onClick={() => {
+                      setReplyCommentId(null);
+                      setReplyingToUsername("");
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </Typography>
+              )}
+              <Box sx={{ display: "flex" }}>
+                <TextField
+                  fullWidth
                   size="small"
-                  onClick={() => {
-                    setReplyCommentId(null);
-                    setReplyingToUsername("");
-                  }}
-                >
-                  Cancel
+                  variant="outlined"
+                  placeholder={
+                    replyCommentId ? "Write a reply..." : "Add a comment..."
+                  }
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  sx={{ mr: 2 }}
+                />
+                <Button variant="contained" onClick={handleAddComment}>
+                  {replyCommentId ? "Reply" : "Post"}
                 </Button>
-              </Typography>
-            )}
-            <Box sx={{ display: "flex" }}>
-              <TextField
-                fullWidth
-                size="small"
-                variant="outlined"
-                placeholder={
-                  replyCommentId ? "Write a reply..." : "Add a comment..."
-                }
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                sx={{ mr: 2 }}
-              />
-              <Button variant="contained" onClick={handleAddComment}>
-                {replyCommentId ? "Reply" : "Post"}
-              </Button>
+              </Box>
             </Box>
-          </Box>
+          )}
         </>
       )}
     </Box>
   );
 };
 
-export default PostDetail;
+export default withRole(PostDetail, [
+  "user",
+  "contributor",
+  "admin",
+  "moderator",
+]);

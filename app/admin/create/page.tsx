@@ -11,6 +11,7 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
+import { WithAdmin } from "@/app/hocs/withAuth";
 
 const AdminCreate = () => {
   const [formData, setFormData] = useState({
@@ -133,4 +134,4 @@ const AdminCreate = () => {
   );
 };
 
-export default AdminCreate;
+export default WithAdmin(AdminCreate);

@@ -46,7 +46,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ reports, updateStatus }) => {
     setPage(0);
   };
 
-  const sortedReports = reports.sort((a, b) => {
+  const sortedReports = reports?.sort((a, b) => {
     if (a[orderBy] !== null && b[orderBy] !== null) {
       if (a[orderBy] < b[orderBy]) {
         return order === "asc" ? -1 : 1;
@@ -58,7 +58,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ reports, updateStatus }) => {
     return 0;
   });
 
-  const paginatedReports = sortedReports.slice(
+  const paginatedReports = sortedReports?.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
@@ -107,20 +107,20 @@ const ReportTable: React.FC<ReportTableProps> = ({ reports, updateStatus }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedReports.map((report) => (
-              <TableRow key={report.ReportID} hover>
+            {paginatedReports?.map((report?) => (
+              <TableRow key={report?.ReportID} hover>
                 <TableCell>
                   <Button
                     variant="text"
                     color="primary"
                     onClick={() =>
                       router.push(
-                        `/profile/${report.ReportedByUsername.String}`
+                        `/profile/${report?.ReportedByUsername.String}`
                       )
                     }
                   >
-                    {report.ReportedByName.Valid
-                      ? report.ReportedByName.String
+                    {report?.ReportedByName.Valid
+                      ? report?.ReportedByName.String
                       : "N/A"}
                   </Button>
                 </TableCell>
@@ -129,34 +129,38 @@ const ReportTable: React.FC<ReportTableProps> = ({ reports, updateStatus }) => {
                     variant="text"
                     color="primary"
                     onClick={() =>
-                      router.push(`/profile/${report.TargetUsername.String}`)
+                      router.push(`/profile/${report?.TargetUsername.String}`)
                     }
                   >
-                    {report.TargetName.Valid ? report.TargetName.String : "N/A"}
+                    {report?.TargetName.Valid
+                      ? report?.TargetName.String
+                      : "N/A"}
                   </Button>
                 </TableCell>
-                <TableCell sx={{ color: "#ff1744" }}>{report.Reason}</TableCell>
+                <TableCell sx={{ color: "#ff1744" }}>
+                  {report?.Reason}
+                </TableCell>
                 <TableCell
                   sx={{
                     fontWeight: "bold",
                     color:
-                      report.Status.String === "pending"
+                      report?.Status.String === "pending"
                         ? "#ff9800"
                         : "#4caf50",
                   }}
                 >
-                  {report.Status.Valid ? report.Status.String : "Unknown"}
+                  {report?.Status.Valid ? report?.Status.String : "Unknown"}
                 </TableCell>
                 <TableCell>
-                  {report.TargetComment.Valid ? (
+                  {report?.TargetComment.Valid ? (
                     <Box>
                       <Typography
                         variant="body2"
                         sx={{ fontStyle: "italic", color: "#616161" }}
                       >
-                        "{report.TargetComment.String}"
+                        "{report?.TargetComment.String}"
                       </Typography>
-                      {report.TargetPostSlug.Valid && (
+                      {report?.TargetPostSlug.Valid && (
                         <Button
                           variant="contained"
                           color="primary"
@@ -164,7 +168,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ reports, updateStatus }) => {
                           sx={{ mt: 1 }}
                           onClick={() =>
                             router.push(
-                              `/posts/${report.TargetPostSlug.String}`
+                              `/posts/${report?.TargetPostSlug.String}`
                             )
                           }
                         >
@@ -172,7 +176,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ reports, updateStatus }) => {
                         </Button>
                       )}
                     </Box>
-                  ) : report.TargetPostSlug.Valid ? (
+                  ) : report?.TargetPostSlug.Valid ? (
                     <Box>
                       <Typography
                         variant="body2"
@@ -186,7 +190,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ reports, updateStatus }) => {
                         size="small"
                         sx={{ mt: 1 }}
                         onClick={() =>
-                          router.push(`/posts/${report.TargetPostSlug.String}`)
+                          router.push(`/posts/${report?.TargetPostSlug.String}`)
                         }
                       >
                         View Post
@@ -197,22 +201,22 @@ const ReportTable: React.FC<ReportTableProps> = ({ reports, updateStatus }) => {
                   )}
                 </TableCell>
                 <TableCell>
-                  {report.ReviewerName.Valid
-                    ? report.ReviewerName.String
+                  {report?.ReviewerName.Valid
+                    ? report?.ReviewerName.String
                     : "N/A"}
                 </TableCell>
                 <TableCell>
-                  {report.ReviewedAt.Valid
-                    ? new Date(report.ReviewedAt.Time).toLocaleDateString()
+                  {report?.ReviewedAt.Valid
+                    ? new Date(report?.ReviewedAt.Time).toLocaleDateString()
                     : "N/A"}
                 </TableCell>
                 <TableCell>
-                  {report.CreatedAt.Valid
-                    ? new Date(report.CreatedAt.Time).toLocaleDateString()
+                  {report?.CreatedAt.Valid
+                    ? new Date(report?.CreatedAt.Time).toLocaleDateString()
                     : "N/A"}
                 </TableCell>
                 <TableCell>
-                  {report.Status.String === "pending" ? (
+                  {report?.Status.String === "pending" ? (
                     <>
                       <Button
                         variant="contained"
@@ -220,7 +224,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ reports, updateStatus }) => {
                         size="small"
                         sx={{ borderRadius: "8px", mr: 1 }}
                         onClick={() =>
-                          updateStatus(report.ReportID, "resolved")
+                          updateStatus(report?.ReportID, "resolved")
                         }
                       >
                         Resolve
@@ -231,7 +235,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ reports, updateStatus }) => {
                         size="small"
                         sx={{ borderRadius: "8px" }}
                         onClick={() =>
-                          updateStatus(report.ReportID, "dismissed")
+                          updateStatus(report?.ReportID, "dismissed")
                         }
                       >
                         Dismiss
@@ -239,7 +243,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ reports, updateStatus }) => {
                     </>
                   ) : (
                     <Typography variant="body2" sx={{ color: "#757575" }}>
-                      {report.Status.String === "resolved"
+                      {report?.Status.String === "resolved"
                         ? "Resolved"
                         : "Dismissed"}
                     </Typography>
@@ -252,7 +256,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ reports, updateStatus }) => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={reports.length}
+          count={reports?.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

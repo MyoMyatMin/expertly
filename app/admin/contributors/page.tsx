@@ -21,6 +21,7 @@ import { Appeals, Report } from "@/types/types";
 import { api } from "@/helper/axiosInstance";
 import ReportTable from "@/components/ReportTable";
 import AppealTable from "@/components/AppealTable";
+import { WithModerator } from "@/app/hocs/withAuth";
 
 const ManageContributors = () => {
   const [tabValue, setTabValue] = useState(0);
@@ -92,4 +93,4 @@ const ManageContributors = () => {
   );
 };
 
-export default ManageContributors;
+export default WithModerator(ManageContributors);

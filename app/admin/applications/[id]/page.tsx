@@ -14,6 +14,7 @@ import { api } from "@/helper/axiosInstance";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 import { ContributorApplication } from "@/types/types";
+import { WithModerator } from "@/app/hocs/withAuth";
 
 const ContributorDetail = () => {
   const { id } = useParams();
@@ -218,4 +219,4 @@ const ContributorDetail = () => {
   );
 };
 
-export default ContributorDetail;
+export default WithModerator(ContributorDetail);

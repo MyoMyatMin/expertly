@@ -1,7 +1,16 @@
 "use client";
-import React from "react";
+import React, { useContext } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import AuthContext from "@/contexts/AuthProvider";
+import {
+  Box,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
+} from "@mui/material";
 
 // Define the navigation links for the Admin section
 const navLinks = [
@@ -12,65 +21,51 @@ const navLinks = [
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname(); // Get the current path for active route
-
+  const { user } = useContext(AuthContext);
   // If we're on the /admin route, render nothing
   if (pathname === "/admin") {
     return null;
   }
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <Box sx={{ display: "flex", minHeight: "100vh" }}>
       {/* Sidebar Navigation */}
-      <aside
-        style={{
-          flexShrink: 0,
-          width: "250px",
-          backgroundColor: "#f8f9fa", //#f8f9fa
-          color: "white",
-          padding: "20px",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <ul style={{ listStyleType: "none", padding: 0, margin: 0 }}>
-          {navLinks.map((link) => (
-            <li key={link.href} style={{ marginBottom: "10px" }}>
-              <Link
-                href={link.href}
-                style={{
-                  color: pathname === link.href ? "#ff006e" : "black",
-                  textDecoration: "none",
-                  padding: "10px",
-                  display: "block",
-                  borderRadius: "5px",
-                  fontSize: "1.1rem",
-                }}
-              >
-                {link.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </aside>
-
-      <div
-        style={{
-          width: "0.5px",
-          backgroundColor: "#E0E0E0",
-          flexShrink: 0,
-        }}
-      ></div>
-
+      {user && (user.role === "admin" || user.role === "moderator") && (
+        <Drawer
+          variant="permanent"
+          sx={{
+            width: 250,
+            flexShrink: 0,
+            [`& .MuiDrawer-paper`]: { width: 250, boxSizing: "border-box" },
+          }}
+        >
+          <List>
+            {navLinks.map((link) => (
+              <ListItem key={link.href} component={Link} href={link.href}>
+                <ListItemText
+                  primary={link.label}
+                  sx={{
+                    color: pathname === link.href ? "#ff006e" : "black",
+                    textDecoration: "none",
+                  }}
+                />
+              </ListItem>
+            ))}
+          </List>
+        </Drawer>
+      )}
+      <Divider orientation="vertical" flexItem />
       {/* Main Content */}
-      <div
-        style={{
+      <Box
+        component="main"
+        sx={{
           flexGrow: 1, // Let the main content take up the remaining space
           overflow: "auto", // Ensure scrollability if content overflows
         }}
       >
         {children}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

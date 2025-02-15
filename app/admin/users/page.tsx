@@ -20,6 +20,7 @@ import { Report, Appeals } from "../../../types/types";
 import { api } from "@/helper/axiosInstance";
 import ReportTable from "@/components/ReportTable";
 import AppealTable from "@/components/AppealTable";
+import { WithModerator } from "@/app/hocs/withAuth";
 
 type Props = {};
 
@@ -80,4 +81,4 @@ const UsersAction = (props: Props) => {
   );
 };
 
-export default UsersAction;
+export default WithModerator(UsersAction);

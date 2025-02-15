@@ -1,4 +1,5 @@
 "use client";
+import { WithContributor } from "@/app/hocs/withAuth";
 import BlogEditor from "@/components/BlogEditor";
 import { api } from "@/helper/axiosInstance";
 import { useRouter } from "next/navigation";
@@ -43,4 +44,4 @@ const CreatePost = (props: Props) => {
   );
 };
 
-export default CreatePost;
+export default WithContributor(CreatePost);

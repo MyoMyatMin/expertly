@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { WithAdmin } from "@/app/hocs/withAuth";
 import {
   Container,
   Typography,
@@ -140,4 +141,4 @@ const AdminPanel = () => {
   );
 };
 
-export default AdminPanel;
+export default WithAdmin(AdminPanel);

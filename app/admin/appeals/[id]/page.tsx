@@ -6,6 +6,7 @@ import { Appeal } from "@/types/types";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { styled } from "@mui/system";
+import { WithModerator } from "@/app/hocs/withAuth";
 
 type Props = {};
 
@@ -168,4 +169,4 @@ const AppealDetails = (props: Props) => {
   );
 };
 
-export default AppealDetails;
+export default WithModerator(AppealDetails);

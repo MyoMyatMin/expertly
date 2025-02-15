@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 
 import { ContributorApplications } from "@/types/types";
 import { api } from "@/helper/axiosInstance";
+import { WithModerator } from "@/app/hocs/withAuth";
 
 const Applications: React.FC = () => {
   const router = useRouter();
@@ -174,4 +175,4 @@ const Applications: React.FC = () => {
   );
 };
 
-export default Applications;
+export default WithModerator(Applications);

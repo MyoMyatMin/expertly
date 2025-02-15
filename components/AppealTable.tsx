@@ -44,7 +44,7 @@ const AppealTable: React.FC<AppealTableProps> = ({ appeals }) => {
     setPage(0);
   };
 
-  const sortedAppeals = appeals.sort((a, b) => {
+  const sortedAppeals = appeals?.sort((a, b) => {
     if (a[orderBy] !== null && b[orderBy] !== null) {
       if (a[orderBy] < b[orderBy]) {
         return order === "asc" ? -1 : 1;
@@ -56,7 +56,7 @@ const AppealTable: React.FC<AppealTableProps> = ({ appeals }) => {
     return 0;
   });
 
-  const paginatedAppeals = sortedAppeals.slice(
+  const paginatedAppeals = sortedAppeals?.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
@@ -104,14 +104,14 @@ const AppealTable: React.FC<AppealTableProps> = ({ appeals }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {paginatedAppeals.map((appeal) => (
-            <TableRow key={appeal.AppealID} hover>
+          {paginatedAppeals?.map((appeal) => (
+            <TableRow key={appeal?.AppealID} hover>
               <TableCell>
                 <Button
                   variant="text"
                   color="primary"
                   onClick={() =>
-                    router.push(`/profile/${appeal.AppealedByUsername.String}`)
+                    router.push(`/profile/${appeal?.AppealedByUsername.String}`)
                   }
                 >
                   {appeal.AppealedByUsername.Valid
@@ -164,7 +164,7 @@ const AppealTable: React.FC<AppealTableProps> = ({ appeals }) => {
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
-        count={appeals.length}
+        count={appeals?.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

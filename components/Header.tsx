@@ -13,7 +13,7 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   Search,
   Whatshot,
@@ -30,6 +30,7 @@ const Header: React.FC = () => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const currentPath = usePathname();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -175,8 +176,8 @@ const Header: React.FC = () => {
           Expertly
         </Typography>
 
-        {/* Show search bar on desktop if not an admin */}
-        {!isMobile && !isAdmin && (
+        {/* Show search bar on desktop if not an admin and on the root page */}
+        {!isMobile && !isAdmin && currentPath === "/" && (
           <TextField
             variant="outlined"
             size="small"
@@ -258,14 +259,28 @@ const Header: React.FC = () => {
                     Create Post
                   </Button>
                 )}
-                <AccountCircle
-                  sx={{
-                    color: "black",
-                    cursor: "pointer",
-                    fontSize: "36px",
-                  }}
-                  onClick={() => router.push(`/profile/${user.username}`)}
-                />
+                {isAdmin ? (
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: "black",
+                      cursor: "default",
+                      fontWeight: "bold",
+                      ml: 2,
+                    }}
+                  >
+                    {user.name}
+                  </Typography>
+                ) : (
+                  <AccountCircle
+                    sx={{
+                      color: "black",
+                      cursor: "pointer",
+                      fontSize: "36px",
+                    }}
+                    onClick={() => router.push(`/profile/${user.username}`)}
+                  />
+                )}
                 <Button
                   variant="outlined"
                   onClick={logout}

@@ -9,6 +9,7 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import AuthContext from "@/contexts/AuthProvider";
 import { api } from "@/helper/axiosInstance";
 import { useRouter } from "next/navigation";
+import { withRole } from "../hocs/withAuth";
 
 type Props = {};
 
@@ -211,4 +212,4 @@ const ApplicationForm = (props: Props) => {
   );
 };
 
-export default ApplicationForm;
+export default withRole(ApplicationForm, ["user"]);
