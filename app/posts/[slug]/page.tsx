@@ -13,6 +13,7 @@ import { Box, Paper } from "@mui/material";
 import { Post } from "@/types/types";
 import { CommentType } from "../../../types/types";
 import { api } from "@/helper/axiosInstance";
+import { get } from "http";
 
 const PostDetail = () => {
   const { slug } = useParams();
@@ -111,8 +112,55 @@ const PostDetail = () => {
     }
   };
 
-  const handleAddComment = () => {
-    /* comment logic */
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return; // Avoid adding empty comments
+
+    try {
+      const newCommentData = {
+        content: newComment,
+        postId: post?.PostID,
+        replyingToCommentId: replyCommentId || null,
+      };
+
+      const response = await api.protected.addComment(
+        newCommentData.postId,
+        newCommentData.content,
+        newCommentData.replyingToCommentId || ""
+      );
+
+      getComments();
+      getPost();
+      setNewComment("");
+      setReplyCommentId(null);
+      setReplyingToUsername("");
+    } catch (error) {
+      console.error("Error adding comment:", error);
+      alert("An error occurred while adding the comment. Please try again.");
+    }
+  };
+
+  const handleEditComment = (commentId: string, newContent: string) => {
+    try {
+      const response = api.protected.editComment(
+        post.PostID,
+        commentId,
+        newContent
+      );
+      getComments();
+      getPost();
+    } catch (error) {
+      console.error("Error editing comment:", error);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      await api.protected.deleteComment(post.PostID, commentId);
+      getComments();
+      getPost();
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+    }
   };
 
   const findCommentUsername = (
@@ -174,25 +222,18 @@ const PostDetail = () => {
               user?.role === "admin" || user?.role === "moderator"
             }
           />
+          {/* Replace the comments section in PostDetail with this code */}
           <Box sx={{ mt: 3 }}>
             {comments.map((comment) => (
               <CommentItem
                 key={comment.id}
                 comment={comment}
                 handleReplyClick={handleReplyClick}
-                renderComments={(replies) =>
-                  replies.map((reply) => (
-                    <CommentItem
-                      key={reply.id}
-                      comment={reply}
-                      handleReplyClick={handleReplyClick}
-                      renderComments={() => null}
-                    />
-                  ))
-                }
+                handleEditComment={handleEditComment}
+                handleDeleteComment={handleDeleteComment}
               />
             ))}
-            {user?.role !== "admin" && user?.role !== "moderator" && (
+            {user && user.role !== "admin" && user.role !== "moderator" && (
               <CommentForm
                 newComment={newComment}
                 setNewComment={setNewComment}
@@ -210,8 +251,8 @@ const PostDetail = () => {
 };
 
 export default withRole(PostDetail, [
-  "user",
-  "contributor",
   "admin",
   "moderator",
+  "user",
+  "contributor",
 ]);

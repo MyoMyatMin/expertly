@@ -329,6 +329,51 @@ export const api = {
       const response = await privateApi.get("/feed");
       return response.data;
     },
+
+    addComment: async (
+      postId: string,
+      content: string,
+      replyCommentId: string
+    ) => {
+      console.log("Adding comment", postId, content, replyCommentId);
+      const response = await privateApi.post(`/posts/${postId}/comments`, {
+        content,
+        replyCommentId: replyCommentId || null,
+      });
+      return response.data;
+    },
+
+    editComment: async (
+      postId: string,
+      commentId: string,
+      newContent: string
+    ) => {
+      try {
+        const response = await privateApi.patch(
+          `/posts/${postId}/comments/${commentId}`,
+          {
+            content: newContent,
+          }
+        );
+        return response.data;
+      } catch (error) {
+        console.error("Error details:", error);
+        const axiosError = error as any;
+        if (axiosError.response) {
+          console.error("Response data:", axiosError.response.data);
+          console.error("Response status:", axiosError.response.status);
+        } else {
+          console.error("Error message:", axiosError.message);
+        }
+      }
+    },
+
+    deleteComment: async (postId: string, commentId: string) => {
+      const response = await privateApi.delete(
+        `/posts/${postId}/comments/${commentId}`
+      );
+      return response;
+    },
   },
 };
 
