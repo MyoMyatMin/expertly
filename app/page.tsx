@@ -30,6 +30,7 @@ const Feed = () => {
       console.error("Error fetching posts:", error);
     }
   };
+
   const getFollowingPosts = async () => {
     try {
       const response = await api.protected.getFollowingFeed();
@@ -38,27 +39,175 @@ const Feed = () => {
       console.error("Error fetching following posts:", error);
     }
   };
+
+  const getUserLikedPosts = async () => {
+    if (user && (user.role === "user" || user.role === "contributor")) {
+      try {
+        const response = await api.protected.getLikedPosts();
+        setLikedPosts(response?.map((post: PostType) => post.PostID));
+      } catch (error) {
+        console.error("Error fetching liked posts:", error);
+      }
+    }
+  };
+
+  const getUserSavedPosts = async () => {
+    if (user && (user.role === "user" || user.role === "contributor")) {
+      try {
+        const response = await api.protected.getSavedPosts(
+          user.username as string
+        );
+        setSavedPosts(response?.map((post: PostType) => post.PostID));
+      } catch (error) {
+        console.error("Error fetching saved posts:", error);
+      }
+    }
+  };
+
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
     if (newValue === 1 && user) {
       getFollowingPosts();
     }
   };
-  const handleLike = (postId: string) =>
+
+  const handleLike = async (postId: string) => {
+    if (!user) return;
+
+    const isCurrentlyLiked = likedPosts?.includes(postId);
+
+    // Optimistically update UI
     setLikedPosts((prev) =>
-      prev.includes(postId)
-        ? prev.filter((id) => id !== postId)
-        : [...prev, postId]
+      isCurrentlyLiked
+        ? (prev ?? []).filter((id) => id !== postId)
+        : [...(prev ?? []), postId]
     );
-  const handleSave = (postId: string) =>
+
+    // Update post like count in the UI for "For You" tab
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.PostID === postId
+          ? {
+              ...post,
+              UpvoteCount: isCurrentlyLiked
+                ? (post.UpvoteCount ?? 0) - 1
+                : (post.UpvoteCount ?? 0) + 1,
+            }
+          : post
+      )
+    );
+
+    // Update post like count in the UI for "Following" tab if it exists
+    if (followingPosts) {
+      setFollowingPosts((prevPosts) =>
+        prevPosts
+          ? prevPosts.map((post) =>
+              post.PostID === postId
+                ? {
+                    ...post,
+                    UpvoteCount: isCurrentlyLiked
+                      ? (post?.UpvoteCount ?? 0) - 1
+                      : (post?.UpvoteCount ?? 0) + 1,
+                  }
+                : post
+            )
+          : null
+      );
+    }
+
+    try {
+      // Call API to update like on server
+      if (!isCurrentlyLiked) {
+        await api.protected.likePost(postId);
+      } else {
+        await api.protected.unlikePost(postId);
+      }
+    } catch (error) {
+      console.error("Error updating like:", error);
+
+      // Revert UI changes if API call fails
+      setLikedPosts((prev) =>
+        isCurrentlyLiked
+          ? [...prev, postId]
+          : prev.filter((id) => id !== postId)
+      );
+
+      // Revert post like count in the UI for "For You" tab
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.PostID === postId
+            ? {
+                ...post,
+                UpvoteCount: isCurrentlyLiked
+                  ? (post.UpvoteCount ?? 0) + 1
+                  : (post.UpvoteCount ?? 0) - 1,
+              }
+            : post
+        )
+      );
+
+      // Revert post like count in the UI for "Following" tab if it exists
+      if (followingPosts) {
+        setFollowingPosts((prevPosts) =>
+          prevPosts
+            ? prevPosts.map((post) =>
+                post.PostID === postId
+                  ? {
+                      ...post,
+                      UpvoteCount: isCurrentlyLiked
+                        ? (post.UpvoteCount ?? 0) + 1
+                        : (post.UpvoteCount ?? 0) - 1,
+                    }
+                  : post
+              )
+            : null
+        );
+      }
+    }
+  };
+
+  const handleSave = async (postId: string) => {
+    if (!user) return;
+
+    const isCurrentlySaved = savedPosts?.includes(postId);
+
+    // Optimistically update UI
     setSavedPosts((prev) =>
-      prev.includes(postId)
-        ? prev.filter((id) => id !== postId)
-        : [...prev, postId]
+      isCurrentlySaved
+        ? prev?.filter((id) => id !== postId)
+        : [...(prev ?? []), postId]
     );
-  const handleReportSubmit = (reason: string, details: string) => {
-    console.log("Report Submitted:", { reason, details });
-    alert("Report submitted successfully!");
+
+    try {
+      // Call API to update saved status on server
+      if (!isCurrentlySaved) {
+        await api.protected.savePost(postId);
+      } else {
+        await api.protected.unsavePost(postId);
+      }
+    } catch (error) {
+      console.error("Error updating saved status:", error);
+
+      // Revert UI changes if API call fails
+      setSavedPosts((prev) =>
+        isCurrentlySaved
+          ? [...prev, postId]
+          : prev.filter((id) => id !== postId)
+      );
+    }
+  };
+
+  const handleReportSubmit = async (reason: string, details: string) => {
+    if (!reportPostId || !user) return;
+
+    try {
+      await api.protected.reportPost(reportPostId, reason, details);
+      alert("Report submitted successfully!");
+    } catch (error) {
+      console.error("Error submitting report:", error);
+      alert("Failed to submit report. Please try again.");
+    }
+
     setReportReason("");
     setCustomReason("");
     setReportPostId(null);
@@ -66,7 +215,11 @@ const Feed = () => {
 
   useEffect(() => {
     getAllPosts();
-  }, []);
+    if (user) {
+      getUserLikedPosts();
+      getUserSavedPosts();
+    }
+  }, [user]);
 
   const shouldShowFollowingTab =
     user && !["admin", "moderator"].includes(user.role);
@@ -99,8 +252,8 @@ const Feed = () => {
                 setReportPostId(id)
               }
               onSave={handleSave}
-              isLiked={likedPosts.includes(post.PostID)}
-              isSaved={savedPosts.includes(post.PostID)}
+              isLiked={likedPosts?.includes(post.PostID)}
+              isSaved={savedPosts?.includes(post.PostID) ?? false}
             />
           ))
         )}

@@ -10,7 +10,12 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  AppBar,
+  Toolbar,
+  Typography,
 } from "@mui/material";
+
+const drawerWidth = 250;
 
 // Define the navigation links for the Admin section
 const navLinks = [
@@ -20,23 +25,29 @@ const navLinks = [
 ];
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
-  const pathname = usePathname(); // Get the current path for active route
+  const pathname = usePathname();
   const { user } = useContext(AuthContext);
-  // If we're on the /admin route, render nothing
+
   if (pathname === "/admin") {
     return null;
   }
 
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
+      {/* Top Header */}
+
       {/* Sidebar Navigation */}
       {user && (user.role === "admin" || user.role === "moderator") && (
         <Drawer
           variant="permanent"
           sx={{
-            width: 250,
+            width: drawerWidth,
             flexShrink: 0,
-            [`& .MuiDrawer-paper`]: { width: 250, boxSizing: "border-box" },
+            [`& .MuiDrawer-paper`]: {
+              width: drawerWidth,
+              boxSizing: "border-box",
+              mt: 8,
+            },
           }}
         >
           <List>
@@ -54,13 +65,21 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           </List>
         </Drawer>
       )}
+
       <Divider orientation="vertical" flexItem />
+
       {/* Main Content */}
       <Box
         component="main"
         sx={{
-          flexGrow: 1, // Let the main content take up the remaining space
-          overflow: "auto", // Ensure scrollability if content overflows
+          flexGrow: 1,
+          overflow: "auto",
+          mt: 8, // Ensure the content is pushed down below the header
+          ml:
+            user && (user.role === "admin" || user.role === "moderator")
+              ? `${drawerWidth}px`
+              : 0,
+          p: 3,
         }}
       >
         {children}

@@ -48,6 +48,9 @@ const Post = ({
                 e.stopPropagation();
                 onLike(post.PostID);
               }}
+              disabled={
+                !user || user.role === "admin" || user.role === "moderator"
+              }
             >
               <ThumbUp color={isLiked ? "primary" : "inherit"} />
             </IconButton>
@@ -62,7 +65,7 @@ const Post = ({
             </Typography>
           </Box>
           <Box>
-            {user && (
+            {user && (user?.role === "user" || user.role === "contributor") && (
               <IconButton
                 onClick={(e) => {
                   e.stopPropagation();
@@ -73,7 +76,7 @@ const Post = ({
               </IconButton>
             )}
 
-            {user && (
+            {user && (user?.role === "user" || user.role === "contributor") && (
               <IconButton
                 onClick={(e) => {
                   e.stopPropagation();

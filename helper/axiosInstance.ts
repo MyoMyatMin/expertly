@@ -163,9 +163,17 @@ export const api = {
       console.log("Following list", response.data);
       return response.data;
     },
+    getFollowers: async (username: string) => {
+      const response = await privateApi.get(`/users/${username}/followers`);
+      return response.data;
+    },
     getSavedPosts: async (username: string) => {
       const response = await privateApi.get(`/saved_posts/${username}`);
       console.log("Saved Posts", response.data);
+      return response.data;
+    },
+    getLikedPosts: async () => {
+      const response = await privateApi.get("/upvotes");
       return response.data;
     },
     getPostsForContributor: async (username: string) => {
@@ -194,10 +202,42 @@ export const api = {
       return response.data;
     },
 
-    unsavedPost: async (postId: string) => {
+    // New function for liking a post
+    likePost: async (postId: string) => {
+      const response = await privateApi.post(`/posts/${postId}/upvotes`);
+      return response.data;
+    },
+
+    // New function for unliking a post
+    unlikePost: async (postId: string) => {
+      const response = await privateApi.delete(`/posts/${postId}/upvotes`);
+      return response.data;
+    },
+
+    // New function for saving a post
+    savePost: async (postId: string) => {
+      const response = await privateApi.post(`/saved_posts`, {
+        post_id: postId,
+      });
+      return response.data;
+    },
+
+    // Function for unsaving a post (already exists, but renamed for consistency)
+    unsavePost: async (postId: string) => {
       const response = await privateApi.delete(`/saved_posts/${postId}`);
       return response.data;
     },
+
+    // New function for reporting a post
+    reportPost: async (postId: string, reason: string, details: string) => {
+      const response = await privateApi.post(`/reports`, {
+        post_id: postId,
+        reason: reason,
+        details: details,
+      });
+      return response.data;
+    },
+
     getPostDetailsbySlug: async (slug: string) => {
       const response = await privateApi.get(`/posts/${slug}`);
       console.log("Post details", response.data);
