@@ -22,6 +22,8 @@ export interface Post {
   UpvoteCount?: number;
   CommentCount?: number;
   Upvotes?: number;
+  HasUpvoted?: boolean;
+  HasSaved?: boolean;
 }
 
 export interface Following {
@@ -204,4 +206,14 @@ export interface Appeal {
     String: string;
     Valid: boolean;
   };
+}
+export interface CommentType {
+  id: string;
+  content: string;
+  parent_comment_id: string | null;
+  post_id: string;
+  user_id: string;
+  replies: CommentType[];
+  username: string;
+  name: string;
 }

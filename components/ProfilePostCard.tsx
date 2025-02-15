@@ -22,7 +22,7 @@ const ProfilePostCard = ({
     e.stopPropagation();
     if (window.confirm("Are you sure you want to unsave this post?")) {
       try {
-        await api.protected.unsavedPost(post.PostID);
+        await api.protected.unsavePost(post.PostID);
         onUnsave?.();
       } catch (error) {
         console.error("Failed to unsave post:", error);

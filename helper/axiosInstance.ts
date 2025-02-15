@@ -238,6 +238,12 @@ export const api = {
       return response.data;
     },
 
+    deletePost: async (slug: string) => {
+      const response = await privateApi.delete(`/posts/${slug}`);
+      console.log("Post deleted", response.data);
+      return response.data;
+    },
+
     getPostDetailsbySlug: async (slug: string) => {
       const response = await privateApi.get(`/posts/${slug}`);
       console.log("Post details", response.data);

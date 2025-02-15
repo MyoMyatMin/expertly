@@ -1,102 +1,74 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import {
-  Box,
-  Typography,
-  Avatar,
-  Button,
-  IconButton,
-  Divider,
-  Paper,
-  TextField,
-} from "@mui/material";
-import { ThumbUp, Comment, Edit, Delete, Reply } from "@mui/icons-material";
-import { api } from "@/helper/axiosInstance";
+import React, { useState, useContext, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import BlogEditor from "@/components/BlogEditor";
 import AuthContext from "@/contexts/AuthProvider";
 import { withRole } from "@/app/hocs/withAuth";
-
-type CommentType = {
-  id: string;
-  content: string;
-  parent_comment_id: string | null;
-  post_id: string;
-  user_id: string;
-  replies: CommentType[];
-  username: string;
-  name: string;
-};
+import PostHeader from "@/components/PostHeader";
+import PostContent from "@/components/PostContent";
+import PostActions from "@/components/PostActions";
+import CommentItem from "@/components/CommentItem";
+import CommentForm from "@/components/CommentForm";
+import { Box, Paper } from "@mui/material";
+import { Post } from "@/types/types";
+import { CommentType } from "../../../types/types";
+import { api } from "@/helper/axiosInstance";
 
 const PostDetail = () => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [postId, setPostId] = useState("");
-  const [comments, setComments] = useState<CommentType[]>([]);
-  const [newComment, setNewComment] = useState("");
-  const [replyCommentId, setReplyCommentId] = useState<string | null>(null);
-  const [replyingToUsername, setReplyingToUsername] = useState<string>("");
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [authorName, setAuthorName] = useState("");
-  const [authorUsername, setAuthorUsername] = useState("");
-  const [authorId, setAuthorId] = useState("");
-  const [createdAt, setCreatedAt] = useState("");
-  const [upvoteCount, setUpvoteCount] = useState(0);
-  const [commentCount, setCommentCount] = useState(0);
-  const [hasUpvoted, setHasUpvoted] = useState(false);
-  const [images, setImages] = useState<string[]>([]);
-  const [showFullBody, setShowFullBody] = useState(false);
-
-  const { user: CurrentUser } = useContext(AuthContext);
-
   const { slug } = useParams();
+  const { user } = useContext(AuthContext);
   const router = useRouter();
+  const [post, setPost] = useState<Post | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [showFullBody, setShowFullBody] = useState(false);
+  const [newComment, setNewComment] = useState("");
+  const [comments, setComments] = useState<CommentType[]>([]);
+  const [replyingToUsername, setReplyingToUsername] = useState("");
+  const [replyCommentId, setReplyCommentId] = useState<string | null>(null);
+  const [images, setImages] = useState<string[]>([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const postResponse = await api.protected.getPostDetailsbySlug(
-          slug as string
-        );
-        setPostId(postResponse.PostID);
-        setTitle(postResponse.Title);
-        setContent(postResponse.Content);
-        setAuthorName(postResponse.AuthorName);
-        setAuthorId(postResponse.UserID);
-        setAuthorUsername(postResponse.AuthorUsername);
-        setCreatedAt(
-          new Date(postResponse.CreatedAt.Time).toLocaleDateString()
-        );
-        setUpvoteCount(postResponse.UpvoteCount);
-        setCommentCount(postResponse.CommentCount);
-
-        const commentsResponse = await api.protected.getPostCommentsBySlug(
-          slug as string
-        );
-        setComments(commentsResponse);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchData();
-  }, [slug]);
-
-  const handleEdit = () => {
-    setIsEditing(true);
+  const getPost = async () => {
+    try {
+      const response = await api.protected.getPostDetailsbySlug(slug as string);
+      setPost(response);
+      console.log("Post details", response?.HasUpvoted);
+    } catch (error) {
+      console.error("Error fetching post:", error);
+    }
   };
 
+  const getComments = async () => {
+    try {
+      const response = await api.protected.getPostCommentsBySlug(
+        slug as string
+      );
+      setComments(response);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    }
+  };
+
+  useEffect(() => {
+    getPost();
+    getComments();
+  }, [slug]);
+
+  if (!post) return <p>Loading...</p>;
+
+  const handleEdit = () => setIsEditing(true);
   const handleSaveEdit = async () => {
+    if (!post) return;
+
     try {
       const response = await api.protected.updatePost({
-        id: postId,
-        title,
-        content,
-        images,
+        id: post.PostID,
+        title: post.Title,
+        content: post.Content,
+        images: images,
       });
 
-      console.log("Post updated successfully:", response.data);
-      alert("Post updated successfully!");
+      setPost(response);
+      router.push(`/posts/${response.Slug}`);
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating post:", error);
@@ -104,23 +76,43 @@ const PostDetail = () => {
     }
   };
 
-  const handleDelete = async () => {
-    try {
-      alert("Post deleted successfully!");
-      router.push("/posts");
-    } catch (error) {
-      console.error("Error deleting post:", error);
-      alert("An error occurred while deleting the post. Please try again.");
+  const handleDelete = () => {
+    if (!post) return;
+
+    if (confirm("Are you sure you want to delete this post?")) {
+      api.protected.deletePost(post.PostID);
+      router.push("/");
     }
   };
 
   const handleUpvote = async () => {
+    if (!post) return;
+
     try {
-      setUpvoteCount((prev) => (hasUpvoted ? prev - 1 : prev + 1));
-      setHasUpvoted((prev) => !prev);
+      // If the post has already been upvoted, un-upvote it
+      if (post.HasUpvoted) {
+        await api.protected.unlikePost(post.PostID);
+        setPost({
+          ...post,
+          UpvoteCount: (post.UpvoteCount ?? 0) - 1,
+          HasUpvoted: false,
+        });
+      } else {
+        // Otherwise, upvote the post
+        await api.protected.likePost(post.PostID);
+        setPost({
+          ...post,
+          UpvoteCount: (post.UpvoteCount ?? 0) + 1,
+          HasUpvoted: true,
+        });
+      }
     } catch (error) {
-      console.error("Error upvoting post:", error);
+      console.error("Error handling upvote:", error);
     }
+  };
+
+  const handleAddComment = () => {
+    /* comment logic */
   };
 
   const findCommentUsername = (
@@ -145,229 +137,75 @@ const PostDetail = () => {
     setReplyingToUsername(username);
   };
 
-  const handleAddComment = () => {
-    if (newComment.trim()) {
-      const newCommentObj: CommentType = {
-        id: Date.now().toString(),
-        content: newComment,
-        parent_comment_id: replyCommentId,
-        post_id: postId,
-        user_id: "currentUserId",
-        replies: [],
-        username: "currentUsername",
-        name: "Current User",
-      };
-
-      const addReply = (commentList: CommentType[]): CommentType[] => {
-        return commentList.map((comment) => {
-          if (comment.id === replyCommentId) {
-            return { ...comment, replies: [...comment.replies, newCommentObj] };
-          } else if (comment.replies.length > 0) {
-            return { ...comment, replies: addReply(comment.replies) };
-          }
-          return comment;
-        });
-      };
-
-      setComments(
-        replyCommentId ? addReply(comments) : [...comments, newCommentObj]
-      );
-      setCommentCount((prev) => prev + 1);
-      setNewComment("");
-      setReplyCommentId(null);
-      setReplyingToUsername("");
-    }
-  };
-
-  const renderComments = (comments: CommentType[]) => {
-    return comments.map((comment) => (
-      <Paper key={comment.id} variant="outlined" sx={{ p: 2, mb: 2 }}>
-        <Typography
-          variant="body2"
-          sx={{ fontWeight: 600, cursor: "pointer" }}
-          onClick={() => router.push(`/profile/${comment.username}`)}
-        >
-          {comment.name} (@{comment.username})
-        </Typography>
-        <Typography variant="body2">{comment.content}</Typography>
-        <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-          <IconButton size="small" onClick={() => handleReplyClick(comment.id)}>
-            <Reply fontSize="small" />
-          </IconButton>
-          <Typography variant="caption">Reply</Typography>
-        </Box>
-        {comment.replies?.length > 0 && (
-          <Box sx={{ pl: 4, mt: 2 }}>{renderComments(comment.replies)}</Box>
-        )}
-      </Paper>
-    ));
-  };
-
-  const isAdminOrModerator =
-    CurrentUser?.role === "admin" || CurrentUser?.role === "moderator";
-
   return (
-    <Box sx={{ maxWidth: 1000, mx: "auto", mt: 4, px: 2 }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 2,
-        }}
-      >
-        <Typography variant="h4" sx={{ fontWeight: 700 }}>
-          {title}
-        </Typography>
-        <Box>
-          {CurrentUser?.user_id === authorId && (
-            <>
-              {isEditing ? (
-                <>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSaveEdit}
-                    sx={{ mr: 1 }}
-                  >
-                    Save
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={() => setIsEditing(false)}
-                  >
-                    Cancel
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <IconButton onClick={handleEdit}>
-                    <Edit />
-                  </IconButton>
-                  <IconButton onClick={handleDelete}>
-                    <Delete />
-                  </IconButton>
-                </>
-              )}
-            </>
-          )}
-        </Box>
-      </Box>
-
+    <Paper sx={{ p: 3, mt: 2 }}>
+      <PostHeader
+        title={post.Title}
+        isEditing={isEditing}
+        handleEdit={handleEdit}
+        handleDelete={handleDelete}
+        handleSaveEdit={handleSaveEdit}
+        setIsEditing={setIsEditing}
+        authorId={post.UserID}
+        currentUser={user}
+      />
       {isEditing ? (
         <BlogEditor
-          title={title}
-          setTitle={setTitle}
-          content={content}
-          setContent={setContent}
+          title={post.Title}
+          content={post.Content}
+          setTitle={(title) => setPost({ ...post, Title: title })}
+          setContent={(content) => setPost({ ...post, Content: content })}
           onSave={handleSaveEdit}
           onImageUpload={setImages}
         />
       ) : (
         <>
-          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-            <Avatar sx={{ mr: 2 }}>{authorName[0]}</Avatar>
-            <Box>
-              <Typography
-                variant="subtitle1"
-                sx={{ fontWeight: 600, cursor: "pointer" }}
-                onClick={() => router.push(`/profile/${authorUsername}`)}
-              >
-                {authorName}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Posted on {createdAt}
-              </Typography>
-            </Box>
-          </Box>
-
-          <Box sx={{ mb: 2 }}>
-            {showFullBody ? (
-              <ReactMarkdown>{content}</ReactMarkdown>
-            ) : (
-              <ReactMarkdown>{`${content.substring(0, 300)}...`}</ReactMarkdown>
+          <PostContent
+            content={post.Content}
+            showFullBody={showFullBody}
+            setShowFullBody={setShowFullBody}
+          />
+          <PostActions
+            upvoteCount={post.UpvoteCount ?? 0}
+            hasUpvoted={post.HasUpvoted ?? false}
+            handleUpvote={handleUpvote}
+            commentCount={post.CommentCount ?? 0}
+            isAdminOrModerator={
+              user?.role === "admin" || user?.role === "moderator"
+            }
+          />
+          <Box sx={{ mt: 3 }}>
+            {comments.map((comment) => (
+              <CommentItem
+                key={comment.id}
+                comment={comment}
+                handleReplyClick={handleReplyClick}
+                renderComments={(replies) =>
+                  replies.map((reply) => (
+                    <CommentItem
+                      key={reply.id}
+                      comment={reply}
+                      handleReplyClick={handleReplyClick}
+                      renderComments={() => null}
+                    />
+                  ))
+                }
+              />
+            ))}
+            {user?.role !== "admin" && user?.role !== "moderator" && (
+              <CommentForm
+                newComment={newComment}
+                setNewComment={setNewComment}
+                handleAddComment={handleAddComment}
+                replyingToUsername={replyingToUsername}
+                setReplyCommentId={setReplyCommentId}
+                setReplyingToUsername={setReplyingToUsername}
+              />
             )}
-            {content.length > 300 && (
-              <Button
-                size="small"
-                onClick={() => setShowFullBody((prev) => !prev)}
-              >
-                {showFullBody ? "Read Less" : "Read More"}
-              </Button>
-            )}
           </Box>
-
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              {!isAdminOrModerator ? (
-                <>
-                  <IconButton onClick={handleUpvote}>
-                    <ThumbUp color={hasUpvoted ? "primary" : "inherit"} />
-                  </IconButton>
-                  <Typography variant="caption">{upvoteCount} Votes</Typography>
-                </>
-              ) : (
-                <Typography variant="caption">{upvoteCount} Upvotes</Typography>
-              )}
-            </Box>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <IconButton>
-                <Comment />
-              </IconButton>
-              <Typography variant="caption">{commentCount} Comments</Typography>
-            </Box>
-          </Box>
-
-          <Divider sx={{ my: 2 }} />
-
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-            Comments
-          </Typography>
-          {renderComments(comments)}
-          {!isAdminOrModerator && (
-            <Box sx={{ mt: 2 }}>
-              {replyCommentId && (
-                <Typography variant="caption" sx={{ mb: 1, display: "block" }}>
-                  Replying to: @{replyingToUsername}
-                  <Button
-                    size="small"
-                    onClick={() => {
-                      setReplyCommentId(null);
-                      setReplyingToUsername("");
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </Typography>
-              )}
-              <Box sx={{ display: "flex" }}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  variant="outlined"
-                  placeholder={
-                    replyCommentId ? "Write a reply..." : "Add a comment..."
-                  }
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  sx={{ mr: 2 }}
-                />
-                <Button variant="contained" onClick={handleAddComment}>
-                  {replyCommentId ? "Reply" : "Post"}
-                </Button>
-              </Box>
-            </Box>
-          )}
         </>
       )}
-    </Box>
+    </Paper>
   );
 };
 
