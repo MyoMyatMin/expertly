@@ -269,3 +269,18 @@ export interface SuspendedReport {
     Valid: boolean;
   };
 }
+
+export interface Moderators {
+  ModeratorID: string; // UUID format
+  Name: string;
+  Email: string;
+  Role: "moderator" | "admin"; // Enum-like string literals
+  CreatedAt: {
+    Time: string; // ISO 8601 datetime string
+    Valid: boolean;
+  };
+  UpdatedAt: {
+    Time: string; // ISO 8601 datetime string
+    Valid: boolean;
+  };
+}

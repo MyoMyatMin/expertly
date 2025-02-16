@@ -90,7 +90,7 @@ const Header: React.FC = () => {
                   variant="contained"
                   color="primary"
                   disabled={isUserSuspended()}
-                  onClick={() => router.push("/admin/panel")}
+                  onClick={() => router.push("/admin/create")}
                   startIcon={<Add />}
                   sx={{ height: "40px" }}
                 >

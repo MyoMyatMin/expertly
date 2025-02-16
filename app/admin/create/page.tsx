@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   TextField,
@@ -8,10 +8,17 @@ import {
   Typography,
   MenuItem,
   Box,
-  Snackbar,
-  Alert,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from "@mui/material";
 import { WithAdmin } from "@/app/hocs/withAuth";
+import { Moderators } from "../../../types/types";
+import { api } from "@/helper/axiosInstance";
 
 const AdminCreate = () => {
   const [formData, setFormData] = useState({
@@ -21,82 +28,73 @@ const AdminCreate = () => {
     role: "moderator",
   });
 
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
+  const [moderators, setModerators] = useState<Moderators[]>([]);
+  const fetchModerators = async () => {
+    try {
+      const response = await api.protected.getAllModerators();
+      setModerators(response);
+    } catch (err) {
+      console.error("Failed to fetch moderators", err);
+    }
+  };
+  useEffect(() => {
+    fetchModerators();
+  }, []);
 
-  // Handle input changes
+  const [newAdmin, setNewAdmin] = useState({
+    name: "",
+    email: "",
+    role: "moderator",
+    password: "",
+  });
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNewAdmin((prev) => ({ ...prev, [name]: value }));
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Basic validation
-    if (!formData.name || !formData.email || !formData.password) {
-      setError("All fields are required");
-      return;
-    }
-
-    try {
-      // Simulated API call
-      console.log("Admin Created:", formData);
-      setSuccess(true);
-      setError("");
-
-      // Clear form after success
-      setFormData({ name: "", email: "", password: "", role: "moderator" });
-    } catch (err) {
-      setError("Failed to create admin");
-    }
+  const handleCreateAdmin = () => {
+    const response = api.protected.createModerator(
+      newAdmin.name,
+      newAdmin.email,
+      newAdmin.password,
+      newAdmin.role
+    );
+    fetchModerators();
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box
-        sx={{ mt: 5, p: 3, boxShadow: 3, borderRadius: 2, bgcolor: "white" }}
-      >
-        <Typography variant="h5" fontWeight={600} gutterBottom>
-          Create Admin
+    <Container maxWidth="md" sx={{ mt: 5 }}>
+      <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          Create New Admin or Moderators
         </Typography>
-
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-
-        <form onSubmit={handleSubmit}>
+        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
           <TextField
-            fullWidth
-            label="Full Name"
+            label="Name"
             name="name"
-            value={formData.name}
+            value={newAdmin.name}
             onChange={handleChange}
-            margin="normal"
-            required
+            fullWidth
+            variant="outlined"
           />
           <TextField
-            fullWidth
             label="Email"
             name="email"
-            type="email"
-            value={formData.email}
+            value={newAdmin.email}
             onChange={handleChange}
-            margin="normal"
-            required
+            fullWidth
+            variant="outlined"
           />
           <TextField
-            fullWidth
             label="Password"
             name="password"
-            type="password"
-            value={formData.password}
+            value={newAdmin.password}
             onChange={handleChange}
-            margin="normal"
-            required
-          />
+            fullWidth
+            variant="outlined"
+          ></TextField>
           <TextField
             fullWidth
             select
@@ -106,30 +104,50 @@ const AdminCreate = () => {
             onChange={handleChange}
             margin="normal"
           >
-            <MenuItem value="superadmin">Superadmin</MenuItem>
+            <MenuItem value="admin">Admin</MenuItem>
             <MenuItem value="moderator">Moderator</MenuItem>
           </TextField>
-
           <Button
-            type="submit"
             variant="contained"
             color="primary"
-            fullWidth
-            sx={{ mt: 2 }}
+            onClick={handleCreateAdmin}
+            sx={{ height: "56px" }}
           >
-            Create Admin
+            Create
           </Button>
-        </form>
-      </Box>
+        </Box>
+      </Paper>
 
-      {/* Snackbar for success message */}
-      <Snackbar
-        open={success}
-        autoHideDuration={3000}
-        onClose={() => setSuccess(false)}
-      >
-        <Alert severity="success">Admin created successfully!</Alert>
-      </Snackbar>
+      {/* Admin Table */}
+      <Paper elevation={3} sx={{ p: 3 }}>
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          Admins List
+        </Typography>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>
+                <strong>Name</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Email</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Role</strong>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {moderators.map((moderator, index) => (
+              <TableRow key={index}>
+                <TableCell>{moderator.Name}</TableCell>
+                <TableCell>{moderator.Email}</TableCell>
+                <TableCell>{moderator.Role}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Paper>
     </Container>
   );
 };

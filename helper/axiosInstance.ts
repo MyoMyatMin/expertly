@@ -1,6 +1,7 @@
 import axios from "axios";
 import { refreshToken } from "@/helper/apihelper";
 import { comment } from "postcss";
+import { create } from "domain";
 
 const publicApi = axios.create({
   baseURL: "http://localhost:8000",
@@ -398,6 +399,26 @@ export const api = {
       const response = await privateApi.post(`/appeals`, {
         reason,
         target_reportID,
+      });
+      return response.data;
+    },
+
+    getAllModerators: async () => {
+      const response = await privateApi.get("/admin/moderators");
+      return response.data;
+    },
+
+    createModerator: async (
+      name: string,
+      email: string,
+      password: string,
+      roles: string
+    ) => {
+      const response = await privateApi.post("/admin/create", {
+        email,
+        name,
+        password,
+        roles,
       });
       return response.data;
     },
