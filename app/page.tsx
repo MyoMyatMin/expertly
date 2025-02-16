@@ -1,6 +1,6 @@
 "use client";
 import React, { useContext, useEffect, useState } from "react";
-import { Box, Tabs, Tab, Typography } from "@mui/material";
+import { Box, Tabs, Tab, Typography, Button } from "@mui/material";
 import Post from "@/components/PostBox";
 import ReportModal from "@/components/ReportModal";
 import { Post as PostType } from "@/types/types";
@@ -132,7 +132,6 @@ const Feed = () => {
           : prev.filter((id) => id !== postId)
       );
 
-      // Revert post like count in the UI for "For You" tab
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
           post.PostID === postId
@@ -197,11 +196,11 @@ const Feed = () => {
     }
   };
 
-  const handleReportSubmit = async (reason: string, details: string) => {
+  const handleReportSubmit = async (reason: string) => {
     if (!reportPostId || !user) return;
 
     try {
-      await api.protected.reportPost(reportPostId, reason, details);
+      await api.protected.reportPost(reportPostId, reason);
       alert("Report submitted successfully!");
     } catch (error) {
       console.error("Error submitting report:", error);
@@ -232,14 +231,30 @@ const Feed = () => {
       </Tabs>
 
       <Box>
-        {tabValue === 1 && (!followingPosts || followingPosts.length === 0) ? (
+        {tabValue === 1 && user?.suspended_until ? (
+          <Box sx={{ textAlign: "center", mt: 5 }}>
+            <Typography variant="h6" gutterBottom>
+              Your account is suspended.
+            </Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() =>
+                (window.location.href = `/profile/${user.username}`)
+              }
+            >
+              Go to Profile
+            </Button>
+          </Box>
+        ) : tabValue === 1 &&
+          (!followingPosts || followingPosts.length === 0) ? (
           <Box sx={{ textAlign: "center", mt: 5 }}>
             <Typography variant="h6" gutterBottom>
               Your following does not have posts yet.
             </Typography>
           </Box>
         ) : (
-          (tabValue === 0 ? posts??[] : followingPosts ?? []).map((post) => (
+          (tabValue === 0 ? posts ?? [] : followingPosts ?? []).map((post) => (
             <Post
               key={post.PostID}
               tab={tabValue}
@@ -265,8 +280,6 @@ const Feed = () => {
         onSubmit={handleReportSubmit}
         reportReason={reportReason}
         setReportReason={setReportReason}
-        customReason={customReason}
-        setCustomReason={setCustomReason}
       />
     </Box>
   );

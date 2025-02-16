@@ -33,15 +33,17 @@ const Applications: React.FC = () => {
     try {
       const res = await api.protected.getContributorApplications();
 
-      // Transform data to match the expected structure
-      const formattedData = res??[].map((app : any) => ({
+      const formattedData = (res ?? []).map((app: any) => ({
         ...app,
-
-        Status: app.Status.Valid ? app.Status.String : "unknown",
-        CreatedAt: app.CreatedAt.Valid ? app.CreatedAt.Time : null,
-        ReviewedAt: app.ReviewedAt.Valid ? app.ReviewedAt.Time : null,
+        Status: app.Status?.Valid ? app.Status.String : "unknown",
+        CreatedAt: app.CreatedAt?.Valid
+          ? new Date(app.CreatedAt.Time).toISOString()
+          : null,
+        ReviewedAt: app.ReviewedAt?.Valid
+          ? new Date(app.ReviewedAt.Time).toISOString()
+          : null,
         ReviewedBy: app.ReviewedBy ?? "Not reviewed yet",
-        ReviewerName: app.ReviewerName.Valid
+        ReviewerName: app.ReviewerName?.Valid
           ? app.ReviewerName.String
           : "Not reviewed yet",
       }));

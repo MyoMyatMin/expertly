@@ -226,6 +226,7 @@ const PostDetail = () => {
           <Box sx={{ mt: 3 }}>
             {comments.map((comment) => (
               <CommentItem
+                postID={post.PostID}
                 key={comment.id}
                 comment={comment}
                 handleReplyClick={handleReplyClick}

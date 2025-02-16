@@ -11,13 +11,24 @@ import {
   Typography,
   TablePagination,
   TableSortLabel,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { Report } from "@/types/types";
 
 type ReportTableProps = {
   reports: Report[];
-  updateStatus: (reportID: string, status: string) => void;
+  updateStatus: (
+    reportID: string,
+    status: string,
+    suspendedDays: number,
+    targetUserID: string
+  ) => void;
 };
 
 type Order = "asc" | "desc";
@@ -28,6 +39,9 @@ const ReportTable: React.FC<ReportTableProps> = ({ reports, updateStatus }) => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [order, setOrder] = useState<Order>("asc");
   const [orderBy, setOrderBy] = useState<keyof Report>("ReportedByName");
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedReportID, setSelectedReportID] = useState<string | null>(null);
+  const [suspendedDays, setsuspendedDays] = useState<number>(0);
 
   const handleRequestSort = (property: keyof Report) => {
     const isAsc = orderBy === property && order === "asc";
@@ -44,6 +58,30 @@ const ReportTable: React.FC<ReportTableProps> = ({ reports, updateStatus }) => {
   ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+  };
+
+  const handleResolve = (reportID: string) => {
+    setSelectedReportID(reportID);
+    setOpenDialog(true);
+  };
+
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+    setSelectedReportID(null);
+    setsuspendedDays(0);
+  };
+
+  const handleDialogSubmit = () => {
+    if (selectedReportID) {
+      const report = reports.find((r) => r.ReportID === selectedReportID);
+      updateStatus(
+        selectedReportID,
+        "resolved",
+        suspendedDays,
+        report?.TargetUserID || ""
+      );
+    }
+    handleDialogClose();
   };
 
   const sortedReports = reports?.sort((a, b) => {
@@ -107,7 +145,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ reports, updateStatus }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedReports?.map((report?) => (
+            {paginatedReports?.map((report) => (
               <TableRow key={report?.ReportID} hover>
                 <TableCell>
                   <Button
@@ -223,9 +261,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ reports, updateStatus }) => {
                         color="primary"
                         size="small"
                         sx={{ borderRadius: "8px", mr: 1 }}
-                        onClick={() =>
-                          updateStatus(report?.ReportID, "resolved")
-                        }
+                        onClick={() => handleResolve(report?.ReportID)}
                       >
                         Resolve
                       </Button>
@@ -235,7 +271,12 @@ const ReportTable: React.FC<ReportTableProps> = ({ reports, updateStatus }) => {
                         size="small"
                         sx={{ borderRadius: "8px" }}
                         onClick={() =>
-                          updateStatus(report?.ReportID, "dismissed")
+                          updateStatus(
+                            report?.ReportID,
+                            "dismissed",
+                            suspendedDays,
+                            report?.TargetUserID
+                          )
                         }
                       >
                         Dismiss
@@ -263,6 +304,36 @@ const ReportTable: React.FC<ReportTableProps> = ({ reports, updateStatus }) => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Box>
+
+      <Dialog open={openDialog} onClose={handleDialogClose}>
+        <DialogTitle>Resolve Report</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Please enter the number of days to be suspended.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Suspension Duration (Days)"
+            type="number"
+            fullWidth
+            variant="outlined"
+            value={suspendedDays}
+            onChange={(e) => {
+              const value = parseInt(e.target.value, 10);
+              setsuspendedDays(isNaN(value) || value < 0 ? 0 : value);
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDialogSubmit} color="primary">
+            Submit
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

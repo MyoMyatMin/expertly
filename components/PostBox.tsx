@@ -65,16 +65,18 @@ const Post = ({
             </Typography>
           </Box>
           <Box>
-            {user && (user?.role === "user" || user.role === "contributor") && (
-              <IconButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onReport(post.PostID);
-                }}
-              >
-                <Report />
-              </IconButton>
-            )}
+            {user &&
+              user.user_id !== post.UserID &&
+              (user.role === "user" || user.role === "contributor") && (
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onReport(post.PostID);
+                  }}
+                >
+                  <Report />
+                </IconButton>
+              )}
 
             {user && (user?.role === "user" || user.role === "contributor") && (
               <IconButton

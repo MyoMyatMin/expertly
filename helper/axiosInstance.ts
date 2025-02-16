@@ -1,5 +1,6 @@
 import axios from "axios";
 import { refreshToken } from "@/helper/apihelper";
+import { comment } from "postcss";
 
 const publicApi = axios.create({
   baseURL: "http://localhost:8000",
@@ -229,11 +230,12 @@ export const api = {
     },
 
     // New function for reporting a post
-    reportPost: async (postId: string, reason: string, details: string) => {
+    reportPost: async (postId: string, reason: string, commentId?: string) => {
+      console.log("Reporting post", postId, reason);
       const response = await privateApi.post(`/reports`, {
-        post_id: postId,
         reason: reason,
-        details: details,
+        target_postID: postId,
+        target_CommentID: commentId || null,
       });
       return response.data;
     },
@@ -285,10 +287,22 @@ export const api = {
       return response.data;
     },
 
-    updateReportStatus: async (reportID: string, status: string) => {
+    updateReportStatus: async (
+      reportID: string,
+      status: string,
+      suspendedDays: number,
+      targetUserID: string
+    ) => {
+      console.log(
+        "Updating report status",
+        reportID,
+        status,
+        suspendedDays,
+        targetUserID
+      );
       const response = await privateApi.put(
         `/admin/reports/${reportID}/status`,
-        { status }
+        { status, suspendedDays, targetUserID }
       );
       return response.data;
     },

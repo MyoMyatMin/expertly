@@ -28,6 +28,7 @@ const UsersAction = (props: Props) => {
   const [tabValue, setTabValue] = useState(0);
   const [reports, setReports] = useState<Report[]>([]);
   const [appeals, setAppeals] = useState<Appeals[]>([]);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const router = useRouter();
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
@@ -37,9 +38,25 @@ const UsersAction = (props: Props) => {
     setReports(response);
   };
 
-  const updateStatus = async (reportID: string, status: string) => {
-    await api.protected.updateReportStatus(reportID, status);
-    getReportedUsers();
+  const updateStatus = async (
+    reportID: string,
+    status: string,
+    suspendedDays: number,
+    targetUserID: string
+  ) => {
+    try {
+      await api.protected.updateReportStatus(
+        reportID,
+        status,
+        suspendedDays,
+        targetUserID
+      );
+      setStatusMessage("Status updated successfully");
+      getReportedUsers();
+    } catch (error) {
+      console.error(error);
+      setStatusMessage("Failed to update status");
+    }
   };
 
   const getAppealedUsers = async () => {

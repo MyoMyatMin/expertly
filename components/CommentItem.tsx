@@ -7,11 +7,14 @@ import {
   TextField,
   Paper,
 } from "@mui/material";
-import { Edit, Delete, Reply } from "@mui/icons-material";
+import { Edit, Delete, Reply, Flag } from "@mui/icons-material";
 import { CommentType } from "@/types/types";
 import AuthContext from "@/contexts/AuthProvider";
+import ReportModal from "@/components/ReportModal";
+import { api } from "@/helper/axiosInstance";
 
 interface CommentItemProps {
+  postID: string;
   comment: CommentType;
   handleReplyClick: (commentId: string) => void;
   handleEditComment?: (commentId: string, newContent: string) => void;
@@ -20,6 +23,7 @@ interface CommentItemProps {
 }
 
 const CommentItem: React.FC<CommentItemProps> = ({
+  postID,
   comment,
   handleReplyClick,
   handleEditComment,
@@ -29,6 +33,9 @@ const CommentItem: React.FC<CommentItemProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editedComment, setEditedComment] = useState(comment.content);
   const { user } = useContext(AuthContext);
+
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportReason, setReportReason] = useState("");
 
   const isAuthor = user && user.username === comment.username;
   const isAdminOrMod =
@@ -48,6 +55,18 @@ const CommentItem: React.FC<CommentItemProps> = ({
   const handleCancelEdit = () => {
     setEditedComment(comment.content);
     setIsEditing(false);
+  };
+
+  const handleReportComment = async () => {
+    try {
+      await api.protected.reportPost(postID, reportReason, comment.id);
+      alert("Comment reported successfully.");
+      setIsReportModalOpen(false);
+      setReportReason("");
+    } catch (error) {
+      console.error("Error reporting comment:", error);
+      alert("An error occurred while reporting. Please try again.");
+    }
   };
 
   return (
@@ -130,13 +149,36 @@ const CommentItem: React.FC<CommentItemProps> = ({
               <Typography variant="caption">Delete</Typography>
             </>
           )}
+          {!isEditing && !isAdminOrMod && !isAuthor && (
+            <>
+              <IconButton
+                size="small"
+                onClick={() => setIsReportModalOpen(true)}
+              >
+                <Flag fontSize="small" />
+              </IconButton>
+              <Typography variant="caption" sx={{ mr: 2 }}>
+                Report
+              </Typography>
+            </>
+          )}
         </Box>
       </Paper>
+
+      {/* Report Modal */}
+      <ReportModal
+        open={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        onSubmit={handleReportComment}
+        reportReason={reportReason}
+        setReportReason={setReportReason}
+      />
 
       {comment.replies && comment.replies.length > 0 && (
         <Box sx={{ mt: 1 }}>
           {comment.replies.map((reply) => (
             <CommentItem
+              postID={postID}
               key={reply.id}
               comment={reply}
               handleReplyClick={handleReplyClick}

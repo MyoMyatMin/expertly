@@ -50,9 +50,19 @@ const ManageContributors = () => {
     }
   };
 
-  const updateStats = async (reportID: string, status: string) => {
+  const updateStats = async (
+    reportID: string,
+    status: string,
+    suspendedDays: number,
+    targetUserID: string
+  ) => {
     try {
-      await api.protected.updateReportStatus(reportID, status);
+      await api.protected.updateReportStatus(
+        reportID,
+        status,
+        suspendedDays,
+        targetUserID
+      );
       setStatusMessage("Status updated successfully");
       getReportedContributors();
     } catch (error) {

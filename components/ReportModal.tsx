@@ -5,11 +5,9 @@ import { Modal, Box, Typography, TextField, Button } from "@mui/material";
 type ReportModalProps = {
   open: boolean;
   onClose: () => void;
-  onSubmit: (reason: string, details: string) => void;
+  onSubmit: (reason: string) => void;
   reportReason: string;
   setReportReason: (value: string) => void;
-  customReason: string;
-  setCustomReason: (value: string) => void;
 };
 
 const ReportModal = ({
@@ -18,8 +16,6 @@ const ReportModal = ({
   onSubmit,
   reportReason,
   setReportReason,
-  customReason,
-  setCustomReason,
 }: ReportModalProps) => {
   return (
     <Modal
@@ -27,7 +23,9 @@ const ReportModal = ({
       onClose={onClose}
       sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
     >
-      <Box sx={{ bgcolor: "background.paper", p: 4, borderRadius: 2, width: 400 }}>
+      <Box
+        sx={{ bgcolor: "background.paper", p: 4, borderRadius: 2, width: 400 }}
+      >
         <Typography variant="h6" gutterBottom>
           Report Post
         </Typography>
@@ -49,20 +47,10 @@ const ReportModal = ({
           <option value="Harassment">Harassment</option>
         </TextField>
 
-        <TextField
-          fullWidth
-          label="Additional Details (Optional)"
-          value={customReason}
-          onChange={(e) => setCustomReason(e.target.value)}
-          multiline
-          rows={3}
-          sx={{ mb: 2 }}
-        />
-
         <Button
           variant="contained"
           color="error"
-          onClick={() => onSubmit(reportReason, customReason)}
+          onClick={() => onSubmit(reportReason)}
           sx={{ mr: 2 }}
         >
           Submit
