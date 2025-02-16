@@ -388,6 +388,19 @@ export const api = {
       );
       return response;
     },
+
+    getSuspendedReportsByUserID: async () => {
+      const response = await privateApi.get(`/profile/reports`);
+      return response.data;
+    },
+    createAppeal: async (reason: string, target_reportID: string) => {
+      console.log("Creating appeal", reason, target_reportID);
+      const response = await privateApi.post(`/appeals`, {
+        reason,
+        target_reportID,
+      });
+      return response.data;
+    },
   },
 };
 

@@ -217,3 +217,55 @@ export interface CommentType {
   username: string;
   name: string;
 }
+
+export interface SuspendedReport {
+  ReportID: string; // UUID
+  ReportedBy: string; // UUID
+  TargetUserID: string; // UUID
+  Reason: string;
+  ReportStatus: {
+    String: string; // e.g., "resolved"
+    Valid: boolean;
+  };
+  ReviewedAt: {
+    Time: string; // ISO datetime string
+    Valid: boolean;
+  };
+  Reviewedby: string; // UUID
+  CreatedAt: {
+    Time: string; // ISO datetime string
+    Valid: boolean;
+  };
+  SuspendDays: {
+    Int32: number; // Number of days suspended
+    Valid: boolean;
+  };
+  TargetUserID_2: string; // UUID (duplicate of TargetUserID)
+  TargetName: {
+    String: string; // Name of the target user
+    Valid: boolean;
+  };
+  TargetUsername: {
+    String: string; // Username of the target user
+    Valid: boolean;
+  };
+  PostID: string | null; // UUID or null
+  TargetPostSlug: {
+    String: string; // Slug of the post
+    Valid: boolean;
+  };
+  CommentID: string | null; // UUID or null
+  TargetComment: {
+    String: string; // Content of the comment
+    Valid: boolean;
+  };
+  AppealID: string | null; // UUID or null
+  AppealStatus: {
+    String: string; // Status of the appeal (empty string if not applicable)
+    Valid: boolean;
+  };
+  AppealCreatedAt: {
+    Time: string; // ISO datetime string (default "0001-01-01T00:00:00Z" if not applicable)
+    Valid: boolean;
+  };
+}
