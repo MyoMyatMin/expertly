@@ -422,6 +422,19 @@ export const api = {
       });
       return response.data;
     },
+    searchUsers: async (query: string) => {
+      const response = await privateApi.get(`/search/users`, {
+        params: { q: query },
+      });
+
+      return response.data;
+    },
+    searchPosts: async (query: string) => {
+      const response = await privateApi.get(`/search/posts`, {
+        params: { q: query },
+      });
+      return response.data;
+    },
   },
 };
 
