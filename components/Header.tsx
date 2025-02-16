@@ -66,7 +66,7 @@ const Header: React.FC = () => {
           Expertly
         </Typography>
 
-        {!isAdmin && !isUserSuspended() && currentPath === "/" && (
+        {/* {!isAdmin && !isUserSuspended() && currentPath === "/" && (
           <TextField
             variant="outlined"
             size="small"
@@ -80,7 +80,7 @@ const Header: React.FC = () => {
               ),
             }}
           />
-        )}
+        )} */}
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           {user ? (

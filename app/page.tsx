@@ -1,9 +1,25 @@
 "use client";
 import React, { useContext, useEffect, useState } from "react";
-import { Box, Tabs, Tab, Typography, Button } from "@mui/material";
+import {
+  Box,
+  Tabs,
+  Tab,
+  Typography,
+  Button,
+  TextField,
+  InputAdornment,
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+  Avatar,
+  Paper,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import Post from "@/components/PostBox";
 import ReportModal from "@/components/ReportModal";
-import { Post as PostType } from "@/types/types";
+import { Post as PostType, User } from "@/types/types";
 import { api } from "@/helper/axiosInstance";
 import AuthContext from "@/contexts/AuthProvider";
 
@@ -21,6 +37,14 @@ const Feed = () => {
   const [followingPosts, setFollowingPosts] = useState<PostType[] | null>(null);
   const { user } = useContext(AuthContext);
   const [posts, setPosts] = useState<PostType[]>([]);
+
+  // Search related states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<{
+    users: User[];
+    posts: PostType[];
+  }>({ users: [], posts: [] });
+  const [isSearching, setIsSearching] = useState(false);
 
   const getAllPosts = async () => {
     try {
@@ -212,6 +236,44 @@ const Feed = () => {
     setReportPostId(null);
   };
 
+  // Handle search
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      setIsSearching(false);
+      setSearchResults({ users: [], posts: [] });
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const [usersResponse, postsResponse] = await Promise.all([
+        api.protected.searchUsers(searchQuery),
+        api.protected.searchPosts(searchQuery),
+      ]);
+      console.log(usersResponse, postsResponse);
+      setSearchResults({
+        users: usersResponse || [],
+        posts: postsResponse || [],
+      });
+    } catch (error) {
+      console.error("Error searching:", error);
+      setSearchResults({ users: [], posts: [] });
+    }
+  };
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (searchQuery) {
+        handleSearch();
+      } else {
+        setIsSearching(false);
+        setSearchResults({ users: [], posts: [] });
+      }
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
+
   useEffect(() => {
     getAllPosts();
     if (user) {
@@ -223,8 +285,142 @@ const Feed = () => {
   const shouldShowFollowingTab =
     user && !["admin", "moderator"].includes(user.role);
 
+  const handleUserClick = (username: string) => {
+    window.location.href = `/profile/${username}`;
+  };
+
+  const handlePostClick = (postId: string) => {
+    window.location.href = `/posts/${postId}`;
+  };
+
   return (
     <Box sx={{ maxWidth: 1000, mx: "auto", mt: 4, px: 2 }}>
+      {/* Search bar */}
+
+      {user && (user.role === "user" || user.role === "contributor") && (
+        <Box sx={{ mb: 3, position: "relative" }}>
+          <TextField
+            fullWidth
+            placeholder="Search for users or posts..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+            variant="outlined"
+          />
+
+          {/* Search results popup */}
+          {isSearching && searchQuery && (
+            <Paper
+              elevation={3}
+              sx={{
+                position: "absolute",
+                top: "100%",
+                left: 0,
+                right: 0,
+                zIndex: 1000,
+                mt: 1,
+                maxHeight: "70vh",
+                overflow: "auto",
+                p: 2,
+              }}
+            >
+              {/* Users section */}
+              <Typography variant="h6" sx={{ mb: 1 }}>
+                Users
+              </Typography>
+              {searchResults.users.length > 0 ? (
+                <List>
+                  {searchResults.users.map((user) => (
+                    <ListItem
+                      component="a"
+                      href="#"
+                      key={user.user_id}
+                      onClick={(e) => {
+                        e.preventDefault(); // Prevent default anchor behavior
+                        handleUserClick(user.username ?? "");
+                      }}
+                      sx={{ borderRadius: 1, mb: 1 }}
+                    >
+                      <ListItemAvatar>
+                        <Avatar
+                          src="https://source.unsplash.com/random"
+                          alt={user.username}
+                        >
+                          {user.name?.charAt(0).toUpperCase()}
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={user.name}
+                        secondary={`@${user.username}`}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              ) : (
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 2 }}
+                >
+                  No users found
+                </Typography>
+              )}
+
+              {/* Divider */}
+              <Divider sx={{ my: 2 }} />
+
+              {/* Posts section */}
+              <Typography variant="h6" sx={{ mb: 1 }}>
+                Posts
+              </Typography>
+              {searchResults.posts.length > 0 ? (
+                <List>
+                  {searchResults.posts.map((post) => (
+                    <ListItem
+                      component="a"
+                      key={post.PostID}
+                      onClick={(e) => {
+                        e.preventDefault(); // Prevent default anchor behavior
+                        handlePostClick(post.Slug);
+                      }}
+                      sx={{ borderRadius: 1, mb: 1, cursor: "pointer" }}
+                    >
+                      <ListItemText
+                        primary={post.Title}
+                        secondary={
+                          <React.Fragment>
+                            <Typography
+                              component="span"
+                              variant="body2"
+                              color="text.primary"
+                            >
+                              by {post.AuthorName}
+                            </Typography>
+                            {" — " +
+                              post.Content.substring(0, 60) +
+                              (post.Content.length > 60 ? "..." : "")}
+                          </React.Fragment>
+                        }
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              ) : (
+                <Typography variant="body2" color="text.secondary">
+                  No posts found
+                </Typography>
+              )}
+            </Paper>
+          )}
+        </Box>
+      )}
+
       <Tabs value={tabValue} onChange={handleTabChange} sx={{ mb: 2 }}>
         <Tab label="For You" />
         {shouldShowFollowingTab && <Tab label="Following" />}
