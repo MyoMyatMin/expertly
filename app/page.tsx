@@ -427,7 +427,9 @@ const Feed = () => {
       </Tabs>
 
       <Box>
-        {tabValue === 1 && user?.suspended_until ? (
+      {tabValue === 1 &&
+        user?.suspended_until &&
+        new Date(user.suspended_until) > new Date() ? (
           <Box sx={{ textAlign: "center", mt: 5 }}>
             <Typography variant="h6" gutterBottom>
               Your account is suspended.
