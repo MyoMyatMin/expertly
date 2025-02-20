@@ -1,17 +1,16 @@
+// axiosinstance.tsx
 import axios from "axios";
 import { refreshToken } from "@/helper/apihelper";
-import { comment } from "postcss";
-import { create } from "domain";
 
 const publicApi = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL: "http://localhost:8000/api",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 const privateApi = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL: "http://localhost:8000/api",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -40,7 +39,6 @@ privateApi.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // If error is not 401 or request has already been retried, reject
     if (error.response?.status !== 401 || originalRequest._retry) {
       return Promise.reject(error);
     }
@@ -48,7 +46,7 @@ privateApi.interceptors.response.use(
 
     if (
       errorMessage !== "token is expired" ||
-      originalRequest.url === "/refresh-token"
+      originalRequest.url === "/auth/refresh-token"
     ) {
       return Promise.reject(error);
     }
@@ -56,7 +54,6 @@ privateApi.interceptors.response.use(
     originalRequest._retry = true;
 
     if (isRefreshing) {
-      console.log("Refreshing token, adding to queue");
       try {
         await new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
@@ -86,7 +83,7 @@ export const api = {
   public: {
     signin: async (email: string, password: string) => {
       const response = await publicApi.post(
-        "/login",
+        "/auth/login",
         { email, password },
         { withCredentials: true }
       );
@@ -94,7 +91,7 @@ export const api = {
     },
     signup: async (email: string, password: string, name: string) => {
       const response = await publicApi.post(
-        "/signup",
+        "/auth/signup",
         {
           email,
           password,
@@ -105,7 +102,7 @@ export const api = {
       return response.data;
     },
     moderatorSigin: async (email: string, password: string) => {
-      const reponse = await publicApi.post(
+      const response = await publicApi.post(
         "/admin/login",
         {
           email,
@@ -113,8 +110,7 @@ export const api = {
         },
         { withCredentials: true }
       );
-      console.log("Moderator signed in", reponse.data);
-      return reponse.data;
+      return response.data;
     },
     getPosts: async () => {
       const response = await publicApi.get("/posts");
@@ -134,7 +130,7 @@ export const api = {
       }
     },
     logout: async () => {
-      await privateApi.post("/logout");
+      await privateApi.post("/auth/logout");
     },
     createPost: async (data: {
       title: string;
@@ -151,18 +147,14 @@ export const api = {
       images: string[];
     }) => {
       const response = await privateApi.put(`/posts/${data.id}`, data);
-      console.log("Post updated", response.data);
       return response.data;
     },
-
     getProfileData: async (username: string) => {
       const response = await privateApi.get(`/profile/${username}`);
       return response.data;
     },
-
     getFollowings: async (username: string) => {
       const response = await privateApi.get(`/users/${username}/following`);
-      console.log("Following list", response.data);
       return response.data;
     },
     getFollowers: async (username: string) => {
@@ -170,8 +162,7 @@ export const api = {
       return response.data;
     },
     getSavedPosts: async (username: string) => {
-      const response = await privateApi.get(`/saved_posts/${username}`);
-      console.log("Saved Posts", response.data);
+      const response = await privateApi.get(`/saved-posts/${username}`);
       return response.data;
     },
     getLikedPosts: async () => {
@@ -182,20 +173,16 @@ export const api = {
       const response = await privateApi.get(`/profile/${username}/posts`);
       return response.data;
     },
-
     followUser: async (userid: string) => {
       const response = await privateApi.post(`/follow`, {
         following_id: userid,
       });
       return response.data;
     },
-
     unfollowUser: async (userid: string) => {
-      console.log("Unfollowing user", userid);
       const response = await privateApi.delete(`/follow/${userid}`);
       return response.data;
     },
-
     updateUser: async (name: string, username: string) => {
       const response = await privateApi.put(`/profile/update`, {
         name: name,
@@ -203,36 +190,25 @@ export const api = {
       });
       return response.data;
     },
-
-    // New function for liking a post
     likePost: async (postId: string) => {
       const response = await privateApi.post(`/posts/${postId}/upvotes`);
       return response.data;
     },
-
-    // New function for unliking a post
     unlikePost: async (postId: string) => {
       const response = await privateApi.delete(`/posts/${postId}/upvotes`);
       return response.data;
     },
-
-    // New function for saving a post
     savePost: async (postId: string) => {
-      const response = await privateApi.post(`/saved_posts`, {
+      const response = await privateApi.post(`/saved-posts`, {
         post_id: postId,
       });
       return response.data;
     },
-
-    // Function for unsaving a post (already exists, but renamed for consistency)
     unsavePost: async (postId: string) => {
-      const response = await privateApi.delete(`/saved_posts/${postId}`);
+      const response = await privateApi.delete(`/saved-posts/${postId}`);
       return response.data;
     },
-
-    // New function for reporting a post
     reportPost: async (postId: string, reason: string, commentId?: string) => {
-      console.log("Reporting post", postId, reason);
       const response = await privateApi.post(`/reports`, {
         reason: reason,
         target_postID: postId,
@@ -240,16 +216,12 @@ export const api = {
       });
       return response.data;
     },
-
     deletePost: async (slug: string) => {
       const response = await privateApi.delete(`/posts/${slug}`);
-      console.log("Post deleted", response.data);
       return response.data;
     },
-
     getPostDetailsbySlug: async (slug: string) => {
       const response = await privateApi.get(`/posts/${slug}`);
-      console.log("Post details", response.data);
       return response.data;
     },
     getPostCommentsBySlug: async (slug: string) => {
@@ -257,157 +229,116 @@ export const api = {
       return response.data;
     },
     getContributorApplications: async () => {
-      const response = await privateApi.get("/admin/contributor_applications");
+      const response = await privateApi.get("/admin/contributor-applications");
       return response.data;
     },
-
     getContributorApplication: async (id: string) => {
       const response = await privateApi.get(
-        `/admin/contributor_applications/${id}`
+        `/admin/contributor-applications/${id}`
       );
       return response.data;
     },
     updateApplicationStatus: async (id: string, app_status: string) => {
-      console.log(app_status);
       const response = await privateApi.put(
-        `/admin/contributor_applications/${id}/status`,
+        `/admin/contributor-applications/${id}/status`,
         {
           app_status,
         }
       );
-      console.log("Application status updated", response.data);
       return response.data;
     },
     getReportsForContributors: async () => {
       const response = await privateApi.get("/admin/contributors/reports");
       return response.data;
     },
-
     getReportsForUsers: async () => {
       const response = await privateApi.get("/admin/users/reports");
       return response.data;
     },
-
     updateReportStatus: async (
       reportID: string,
       status: string,
       suspendedDays: number,
       targetUserID: string
     ) => {
-      console.log(
-        "Updating report status",
-        reportID,
-        status,
-        suspendedDays,
-        targetUserID
-      );
       const response = await privateApi.put(
         `/admin/reports/${reportID}/status`,
         { status, suspendedDays, targetUserID }
       );
       return response.data;
     },
-
     getAppealsForContributors: async () => {
       const response = await privateApi.get("/admin/contributors/appeals");
       return response.data;
     },
-
     getAppealsForUsers: async () => {
       const response = await privateApi.get("/admin/users/appeals");
-      console.log("User appeals", response.data);
       return response.data;
     },
-
     getAppealsByID: async (appealID: string) => {
       const response = await privateApi.get(`/admin/appeals/${appealID}`);
       return response.data;
     },
-
     updateAppealStatus: async (appealID: string, status: string) => {
-      console.log("Updating appeal status", appealID, status);
       const response = await privateApi.put(
         `/admin/appeals/${appealID}/status`,
         { status }
       );
       return response.data;
     },
-
     createContributorApplication: async (data: {}) => {
-      console.log("Creating contributor application", data);
-      const response = await privateApi.post("/contributor_application", data);
-
+      const response = await privateApi.post("/contributor-applications", data);
       return response.data;
     },
-
     getFollowingFeed: async () => {
       const response = await privateApi.get("/feed");
       return response.data;
     },
-
     addComment: async (
       postId: string,
       content: string,
       replyCommentId: string
     ) => {
-      console.log("Adding comment", postId, content, replyCommentId);
       const response = await privateApi.post(`/posts/${postId}/comments`, {
         content,
         replyCommentId: replyCommentId || null,
       });
       return response.data;
     },
-
     editComment: async (
       postId: string,
       commentId: string,
       newContent: string
     ) => {
-      try {
-        const response = await privateApi.patch(
-          `/posts/${postId}/comments/${commentId}`,
-          {
-            content: newContent,
-          }
-        );
-        return response.data;
-      } catch (error) {
-        console.error("Error details:", error);
-        const axiosError = error as any;
-        if (axiosError.response) {
-          console.error("Response data:", axiosError.response.data);
-          console.error("Response status:", axiosError.response.status);
-        } else {
-          console.error("Error message:", axiosError.message);
+      const response = await privateApi.patch(
+        `/posts/${postId}/comments/${commentId}`,
+        {
+          content: newContent,
         }
-      }
+      );
+      return response.data;
     },
-
     deleteComment: async (postId: string, commentId: string) => {
       const response = await privateApi.delete(
         `/posts/${postId}/comments/${commentId}`
       );
       return response;
     },
-
     getSuspendedReportsByUserID: async () => {
       const response = await privateApi.get(`/profile/reports`);
       return response.data;
     },
     createAppeal: async (reason: string, target_reportID: string) => {
-      console.log("Creating appeal", reason, target_reportID);
       const response = await privateApi.post(`/appeals`, {
         reason,
         target_reportID,
       });
       return response.data;
     },
-
     getAllModerators: async () => {
       const response = await privateApi.get("/admin/moderators");
       return response.data;
     },
-
     createModerator: async (
       name: string,
       email: string,
@@ -426,7 +357,6 @@ export const api = {
       const response = await privateApi.get(`/search/users`, {
         params: { q: query },
       });
-
       return response.data;
     },
     searchPosts: async (query: string) => {
