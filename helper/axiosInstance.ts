@@ -157,10 +157,6 @@ export const api = {
       const response = await privateApi.get(`/users/${username}/following`);
       return response.data;
     },
-    getFollowers: async (username: string) => {
-      const response = await privateApi.get(`/users/${username}/followers`);
-      return response.data;
-    },
     getSavedPosts: async (username: string) => {
       const response = await privateApi.get(`/saved-posts/${username}`);
       return response.data;

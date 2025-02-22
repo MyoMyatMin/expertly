@@ -25,6 +25,7 @@ export interface Post {
   HasUpvoted?: boolean;
   HasSaved?: boolean;
   AuthorName?: string;
+  AuthorUsername?: string;
 }
 
 export interface Following {

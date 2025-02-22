@@ -195,6 +195,8 @@ const PostDetail = () => {
         handleSaveEdit={handleSaveEdit}
         setIsEditing={setIsEditing}
         authorId={post.UserID}
+        authorName={post.AuthorName ?? ""}
+        authorUsername={post.AuthorUsername ?? ""}
         currentUser={user}
       />
       {isEditing ? (
