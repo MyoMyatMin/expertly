@@ -239,8 +239,8 @@ const UserProfilePage = () => {
 
       <Paper elevation={0} sx={{ p: 4, textAlign: "center" }}>
         <Avatar
-          src={"https://randomuser.me/api/portraits/men/75.jpg"}
-          alt="Profile Pic"
+          src="https://source.unsplash.com/random"
+          alt={userData.name}
           sx={{ width: 120, height: 120, mx: "auto", mb: 2 }}
         />
         {isEditing ? (

@@ -226,7 +226,7 @@ const PostDetail = () => {
           />
           {/* Replace the comments section in PostDetail with this code */}
           <Box sx={{ mt: 3 }}>
-            {comments.map((comment) => (
+            {comments?.map((comment) => (
               <CommentItem
                 postID={post.PostID}
                 key={comment.id}
