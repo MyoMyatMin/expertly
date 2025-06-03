@@ -2,15 +2,19 @@
 import axios from "axios";
 import { refreshToken } from "@/helper/apihelper";
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const publicApi = axios.create({
-  baseURL: "http://localhost:8000/api",
+  baseURL: BASE_URL,
+  timeout: 30000,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 const privateApi = axios.create({
-  baseURL: "http://localhost:8000/api",
+  baseURL: BASE_URL,
+  timeout: 30000,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",

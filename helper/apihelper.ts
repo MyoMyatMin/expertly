@@ -1,7 +1,7 @@
 export const refreshToken = async (): Promise<boolean> => {
   try {
     const refreshResponse = await fetch(
-      "http://localhost:8000/api/auth/refresh-token",
+      process.env.NEXT_PUBLIC_API_URL + "/auth/refresh",
       {
         method: "POST",
         headers: {
