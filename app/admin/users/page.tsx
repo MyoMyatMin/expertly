@@ -1,35 +1,17 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import {
-  Tabs,
-  Tab,
-  Box,
-  Container,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Avatar,
-  Button,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
-import { useRouter } from "next/navigation";
+import { Tabs, Tab, Container, useMediaQuery, useTheme } from "@mui/material";
 import { Report, Appeals } from "../../../types/types";
 import { api } from "@/helper/axiosInstance";
 import ReportTable from "@/components/ReportTable";
 import AppealTable from "@/components/AppealTable";
 import { WithModerator } from "@/app/hocs/withAuth";
 
-type Props = {};
-
-const UsersAction = (props: Props) => {
+const UsersAction = () => {
   const [tabValue, setTabValue] = useState(0);
   const [reports, setReports] = useState<Report[]>([]);
   const [appeals, setAppeals] = useState<Appeals[]>([]);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const router = useRouter();
+  const [, setStatusMessage] = useState<string | null>(null);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 

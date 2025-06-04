@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { api } from "@/helper/axiosInstance";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-
+import Image from "next/image";
 import { ContributorApplication } from "@/types/types";
 import { WithModerator } from "@/app/hocs/withAuth";
 
@@ -78,7 +78,7 @@ const ContributorDetail = () => {
         }}
       >
         <Box sx={{ mr: 4, mb: 3, textAlign: "center" }}>
-          <img
+          <Image
             src={contributor.IdentityProof}
             alt="Identity Proof"
             style={{ width: "100%", maxWidth: "300px", borderRadius: "8px" }}

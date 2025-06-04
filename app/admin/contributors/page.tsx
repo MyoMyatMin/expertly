@@ -3,20 +3,11 @@ import React, { useEffect, useState } from "react";
 import {
   Tabs,
   Tab,
-  Box,
   Container,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Button,
-  Typography,
   useMediaQuery,
   useTheme,
   Alert,
 } from "@mui/material";
-import { useRouter } from "next/navigation";
 import { Appeals, Report } from "@/types/types";
 import { api } from "@/helper/axiosInstance";
 import ReportTable from "@/components/ReportTable";
@@ -30,7 +21,6 @@ const ManageContributors = () => {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
-  const router = useRouter();
 
   const getReportedContributors = async () => {
     try {

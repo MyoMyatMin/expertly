@@ -1,5 +1,5 @@
 "use client";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { Container, Typography, Box, Avatar, Button } from "@mui/material";
 import { api } from "@/helper/axiosInstance";
 import { Appeal } from "@/types/types";
@@ -7,8 +7,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { styled } from "@mui/system";
 import { WithModerator } from "@/app/hocs/withAuth";
-
-type Props = {};
 
 const StyledLink = styled(Link)({
   textDecoration: "none",
@@ -18,9 +16,8 @@ const StyledLink = styled(Link)({
   },
 });
 
-const AppealDetails = (props: Props) => {
+const AppealDetails = () => {
   const { id } = useParams();
-  const router = useRouter();
   const [appeal, setAppeal] = useState<Appeal | null>(null);
 
   const getAppeal = async () => {
@@ -40,7 +37,7 @@ const AppealDetails = (props: Props) => {
 
   useEffect(() => {
     getAppeal();
-  }, []);
+  }, [getAppeal]);
 
   if (!appeal) {
     return (

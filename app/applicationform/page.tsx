@@ -10,8 +10,7 @@ import AuthContext from "@/contexts/AuthProvider";
 import { api } from "@/helper/axiosInstance";
 import { useRouter } from "next/navigation";
 import { withRole } from "../hocs/withAuth";
-
-type Props = {};
+import Image from "next/image";
 
 interface CloudinaryUploadResult {
   event: string;
@@ -23,7 +22,7 @@ interface CloudinaryUploadResult {
   };
 }
 
-const ApplicationForm = (props: Props) => {
+const ApplicationForm = () => {
   const { user } = useContext(AuthContext);
   const [name, setName] = useState("");
   const [expertiseLinks, setExpertiseLinks] = useState<string[]>([""]);
@@ -173,7 +172,7 @@ const ApplicationForm = (props: Props) => {
           <Typography variant="body2" sx={{ mb: 1 }}>
             Uploaded:
           </Typography>
-          <img
+          <Image
             src={identityProofUrl}
             alt="Identity Proof"
             style={{ maxWidth: "100%", height: "auto" }}

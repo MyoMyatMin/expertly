@@ -49,7 +49,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ reports, updateStatus }) => {
     setOrderBy(property);
   };
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
@@ -196,7 +196,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ reports, updateStatus }) => {
                         variant="body2"
                         sx={{ fontStyle: "italic", color: "#616161" }}
                       >
-                        "{report?.TargetComment.String}"
+                        {report?.TargetComment.String}
                       </Typography>
                       {report?.TargetPostSlug.Valid && (
                         <Button
@@ -220,7 +220,7 @@ const ReportTable: React.FC<ReportTableProps> = ({ reports, updateStatus }) => {
                         variant="body2"
                         sx={{ fontStyle: "italic", color: "#616161" }}
                       >
-                        "Reported Post"
+                        Reported Post
                       </Typography>
                       <Button
                         variant="contained"

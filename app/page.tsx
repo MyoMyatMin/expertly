@@ -33,7 +33,7 @@ const Feed = () => {
   const [savedPosts, setSavedPosts] = useState<string[]>([]);
   const [reportPostId, setReportPostId] = useState<string | null>(null);
   const [reportReason, setReportReason] = useState("");
-  const [customReason, setCustomReason] = useState("");
+  const [, setCustomReason] = useState("");
   const [followingPosts, setFollowingPosts] = useState<PostType[] | null>(null);
   const { user } = useContext(AuthContext);
   const [posts, setPosts] = useState<PostType[]>([]);
@@ -427,7 +427,7 @@ const Feed = () => {
       </Tabs>
 
       <Box>
-      {tabValue === 1 &&
+        {tabValue === 1 &&
         user?.suspended_until &&
         new Date(user.suspended_until) > new Date() ? (
           <Box sx={{ textAlign: "center", mt: 5 }}>

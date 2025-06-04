@@ -2,17 +2,14 @@
 import { WithContributor } from "@/app/hocs/withAuth";
 import BlogEditor from "@/components/BlogEditor";
 import { api } from "@/helper/axiosInstance";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-type Props = {};
-
-const CreatePost = (props: Props) => {
+const CreatePost = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [images, setImages] = useState<string[]>([]);
-  const [isSaving, setIsSaving] = useState(false);
-  const router = useRouter();
+  const [, setIsSaving] = useState(false);
+
   const onSave = async () => {
     setIsSaving(true);
     try {

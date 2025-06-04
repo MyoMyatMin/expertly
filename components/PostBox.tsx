@@ -18,7 +18,6 @@ type PostComponentProps = {
 };
 
 const Post = ({
-  tab,
   post,
   onLike,
   onReport,

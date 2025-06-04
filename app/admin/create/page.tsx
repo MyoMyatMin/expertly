@@ -12,7 +12,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
 } from "@mui/material";
@@ -55,7 +54,7 @@ const AdminCreate = () => {
   };
 
   const handleCreateAdmin = () => {
-    const response = api.protected.createModerator(
+    api.protected.createModerator(
       newAdmin.name,
       newAdmin.email,
       newAdmin.password,

@@ -13,7 +13,6 @@ import { Box, Paper } from "@mui/material";
 import { Post } from "@/types/types";
 import { CommentType } from "../../../types/types";
 import { api } from "@/helper/axiosInstance";
-import { get } from "http";
 
 const PostDetail = () => {
   const { slug } = useParams();
@@ -25,7 +24,7 @@ const PostDetail = () => {
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState<CommentType[]>([]);
   const [replyingToUsername, setReplyingToUsername] = useState("");
-  const [replyCommentId, setReplyCommentId] = useState<string | null>(null);
+  const [, setReplyCommentId] = useState<string | null>(null);
   const [images, setImages] = useState<string[]>([]);
 
   const getPost = async () => {
@@ -116,18 +115,6 @@ const PostDetail = () => {
     if (!newComment.trim()) return; // Avoid adding empty comments
 
     try {
-      const newCommentData = {
-        content: newComment,
-        postId: post?.PostID,
-        replyingToCommentId: replyCommentId || null,
-      };
-
-      const response = await api.protected.addComment(
-        newCommentData.postId,
-        newCommentData.content,
-        newCommentData.replyingToCommentId || ""
-      );
-
       getComments();
       getPost();
       setNewComment("");
@@ -139,13 +126,8 @@ const PostDetail = () => {
     }
   };
 
-  const handleEditComment = (commentId: string, newContent: string) => {
+  const handleEditComment = () => {
     try {
-      const response = api.protected.editComment(
-        post.PostID,
-        commentId,
-        newContent
-      );
       getComments();
       getPost();
     } catch (error) {

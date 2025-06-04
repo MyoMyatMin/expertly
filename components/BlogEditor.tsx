@@ -5,13 +5,13 @@ import {
   Box,
   TextField,
   Button,
-  Chip,
   Paper,
   Typography,
   IconButton,
 } from "@mui/material";
 import { CldUploadWidget } from "next-cloudinary";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Image from "next/image";
 
 interface CloudinaryUploadResult {
   event: string;
@@ -174,7 +174,7 @@ function BlogEditor({
                       >
                         <DeleteIcon fontSize="small" />
                       </IconButton>
-                      <img
+                      <Image
                         src={url}
                         alt={`Preview ${index}`}
                         style={{ width: "100%", marginBottom: "8px" }}

@@ -117,7 +117,7 @@ const AppealsTab: React.FC = () => {
           </Typography>
           <Typography variant="body2" color="text.secondary">
             If you believe there should be reports here, please wait for the
-            admin's review.
+            admin&#39;s review.
           </Typography>
         </Paper>
       ) : (

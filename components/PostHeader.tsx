@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Button, IconButton, Link } from "@mui/material";
+import { Box, Typography, Button, IconButton } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import { User } from "@/types/types";
 import { useRouter } from "next/navigation";
@@ -22,7 +22,6 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   isEditing,
   handleEdit,
   handleDelete,
-  handleSaveEdit,
   setIsEditing,
   authorId,
   authorName,

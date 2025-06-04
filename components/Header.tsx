@@ -1,44 +1,20 @@
 "use client";
 
 import React, { useContext } from "react";
+import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
+import { useRouter } from "next/navigation";
 import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  Box,
-  TextField,
-  InputAdornment,
-  IconButton,
-  Menu,
-  MenuItem,
-} from "@mui/material";
-import { useRouter, usePathname } from "next/navigation";
-import {
-  Search,
   Whatshot,
   Add,
   AccountCircle,
   AdminPanelSettings,
 } from "@mui/icons-material";
-import { useTheme } from "@mui/material";
+
 import AuthContext from "@/contexts/AuthProvider";
 
 const Header: React.FC = () => {
   const { user, logout } = useContext(AuthContext);
   const router = useRouter();
-  const theme = useTheme();
-  const currentPath = usePathname();
-
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
 
   // Suspended logic: returns true if the user's suspended_until date is in the future.
   const isUserSuspended = () => {
